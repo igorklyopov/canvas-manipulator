@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas manipulator</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <h1>Canvas manipulator</h1>
+
+    <div class="container">
+      <div class="canvas-ellipse">
+        <div class="canvas">
+          <ul class="list canvas-controlls js-controlls-canvas">
+            <li>
+              <label class="canvas-control">
+                <span class="controlls-name">width</span>
+                <input type="number" name="" id="" value="300" />
+              </label>
+            </li>
+            <li>
+              <label class="canvas-control">
+                <span class="controlls-name">height</span>
+                <input type="number" name="" id="" value="150" />
+              </label>
+            </li>
+          </ul>
+          <canvas id="canvas-ellipse"></canvas>
+        </div>
+        <ul class="list controlls-list js-controlls-shape">
+          <li class="controlls-item">
+            <input type="number" name="" id="" value="100" class="max-value" />
+            <label>
+              <span class="control-name">cx</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="100"
+                step="1"
+                name="cx"
+                class="js-control-input"
+              />
+            </label>
+            <span class="value" data-value="cx">0</span>
+          </li>
+          <li class="controlls-item">
+            <input type="number" name="" id="" value="100" class="max-value" />
+            <label>
+              <span class="control-name">cy</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="100"
+                step="1"
+                name="cy"
+                class="js-control-input"
+              />
+            </label>
+            <span class="value" data-value="cy">0</span>
+          </li>
+          <li class="controlls-item">
+            <input type="number" name="" id="" value="100" class="max-value" />
+            <label>
+              <span class="control-name">radiusX</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="100"
+                step="1"
+                name="radiusX"
+                class="js-control-input"
+              />
+            </label>
+            <span class="value" data-value="radiusX">0</span>
+          </li>
+          <li class="controlls-item">
+            <input type="number" name="" id="" value="100" class="max-value" />
+            <label>
+              <span class="control-name">radiusY</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="100"
+                step="1"
+                name="radiusY"
+                class="js-control-input"
+              />
+            </label>
+            <span class="value" data-value="radiusY">0</span>
+          </li>
+          <li class="controlls-item">
+            <input type="number" name="" id="" value="100" class="max-value" />
+            <label>
+              <span class="control-name">rotation</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="100"
+                step="1"
+                name="rotation"
+                class="js-control-input"
+              />
+            </label>
+            <span class="value" data-value="rotation">0</span>
+          </li>
+          <li class="controlls-item">
+            <input type="number" name="" id="" value="100" class="max-value" />
+            <label>
+              <span class="control-name">startAngle</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="100"
+                step="1"
+                name="startAngle"
+                class="js-control-input"
+              />
+            </label>
+            <span class="value" data-value="startAngle">0</span>
+          </li>
+          <li class="controlls-item">
+            <input type="number" name="" id="" value="100" class="max-value" />
+            <label>
+              <span class="control-name">endAngle</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="100"
+                step="1"
+                name="endAngle"
+                class="js-control-input"
+              />
+            </label>
+            <span class="value" data-value="endAngle">0</span>
+          </li>
+          <li class="controlls-item">
+            <div class="">
+              <span class="control-name">counterclockwise</span>
+
+              <label>
+                <span class="">true</span>
+                <input
+                  type="radio"
+                  name="counterclockwise"
+                  value="true"
+                  checked
+                  class="js-control-input"
+                />
+              </label>
+              <label>
+                <span class="">false</span>
+                <input
+                  type="radio"
+                  name="counterclockwise"
+                  value="false"
+                  class="js-control-input"
+                />
+              </label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <style>
+      /* =================================== */
+      h1 {
+        text-align: center;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 10px;
+
+        outline: 2px dashed darkorange;
+        border-radius: 5px;
+        justify-content: space-between;
+      }
+
+      .wrap {
+        margin-top: 20px;
+      }
+    </style>
+    <script src="../js/main.js"></script>
+  </body>
+</html>
