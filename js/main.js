@@ -1,5 +1,3 @@
-console.log('main.js connection success');
-
 // ====== ======>
 function getCanvasEllipseControls(...args) {
   const [containerClassName] = args;
@@ -46,18 +44,33 @@ function getCanvasEllipseControls(...args) {
   const shapeParams = savedShapeParams ?? initialShapeParams;
 
   controllsShapeRef.addEventListener('input', (e) => {
-    // render controlls values
     if (e.target.type === 'range') {
-      controlValueRefs[e.target.name].innerText = e.target.value;
+      renderControllsValues(e);
     }
-    // ------------
 
-    shapeParams[e.target.name] =
-      e.target.type === 'range' ? Number(e.target.value) : e.target.value;
+    setShapeParams(e);
 
-    // save params
-    localStorage.setItem('shapeParams', JSON.stringify(shapeParams));
-    // ------------
+    clearCanvas();
+    drawEllipse();
+  });
+  controllsShapeRef.addEventListener('mousewheel', (e) => {
+    if (e.target.type !== 'range') {
+      return;
+    }
+
+    const maxValue = Number(e.target.max);
+    const minValue = Number(e.target.min);
+    const step = Number(e.target.step);
+    const currentValue = Number(e.target.value);
+
+    if (e.deltaY < 0 && currentValue < maxValue) {
+      e.target.value = currentValue + step;
+    } else if (e.deltaY > 0 && currentValue > minValue) {
+      e.target.value = currentValue - step;
+    }
+
+    setShapeParams(e);
+    renderControllsValues(e);
 
     clearCanvas();
     drawEllipse();
@@ -107,6 +120,21 @@ function getCanvasEllipseControls(...args) {
     // ctx.fill();
   }
 
+  function setShapeParams(e) {
+    // set params
+    shapeParams[e.target.name] =
+      e.target.type === 'range' ? Number(e.target.value) : e.target.value;
+    // ------------
+
+    // save params
+    localStorage.setItem('shapeParams', JSON.stringify(shapeParams));
+    // ------------
+  }
+
+  function renderControllsValues(e) {
+    controlValueRefs[e.target.name].innerText = e.target.value;
+  }
+
   // console.log('ctx', ctx);
 }
 getCanvasEllipseControls('canvas-ellipse');
@@ -114,9 +142,11 @@ getCanvasEllipseControls('canvas-ellipse');
 // <===== ======
 
 // ====== ======>
+
 // <===== ======
 
 // ====== ======>
+
 // <===== =====
 
 // ====== ======>
