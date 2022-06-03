@@ -13,32 +13,40 @@
     <div class="container">
       <div class="canvas-ellipse">
         <div class="canvas">
-          <ul class="list canvas-controlls js-controlls-canvas">
+          <ul class="list canvas-controls js-controls-canvas">
             <li>
               <label class="canvas-control">
-                <span class="controlls-name">width</span>
+                <span class="controls-name">width</span>
                 <input type="number" name="" id="" value="300" />
               </label>
             </li>
             <li>
               <label class="canvas-control">
-                <span class="controlls-name">height</span>
+                <span class="controls-name">height</span>
                 <input type="number" name="" id="" value="150" />
               </label>
             </li>
           </ul>
           <canvas id="canvas-ellipse"></canvas>
         </div>
-        <ul class="list controlls-list js-controlls-shape">
-          <li class="controlls-item">
-            <input type="number" name="" id="" value="100" class="max-value" />
+        <ul class="list controls-list js-controls-shape">
+          <li class="controls-item">
+            <input
+              type="number"
+              name=""
+              id=""
+              value="300"
+              class="max-value"
+              data-type="max-value"
+              data-for="cx"
+            />
             <label>
               <span class="control-name">cx</span>
               <input
                 type="range"
                 value="0"
                 min="0"
-                max="100"
+                max="300"
                 step="1"
                 name="cx"
                 class="js-control-input"
@@ -46,15 +54,23 @@
             </label>
             <span class="value" data-value="cx">0</span>
           </li>
-          <li class="controlls-item">
-            <input type="number" name="" id="" value="100" class="max-value" />
+          <li class="controls-item">
+            <input
+              type="number"
+              name=""
+              id=""
+              value="150"
+              class="max-value"
+              data-type="max-value"
+              data-for="cy"
+            />
             <label>
               <span class="control-name">cy</span>
               <input
                 type="range"
                 value="0"
                 min="0"
-                max="100"
+                max="150"
                 step="1"
                 name="cy"
                 class="js-control-input"
@@ -62,8 +78,16 @@
             </label>
             <span class="value" data-value="cy">0</span>
           </li>
-          <li class="controlls-item">
-            <input type="number" name="" id="" value="100" class="max-value" />
+          <li class="controls-item">
+            <input
+              type="number"
+              name=""
+              id=""
+              value="100"
+              class="max-value"
+              data-type="max-value"
+              data-for="radiusX"
+            />
             <label>
               <span class="control-name">radiusX</span>
               <input
@@ -78,8 +102,16 @@
             </label>
             <span class="value" data-value="radiusX">0</span>
           </li>
-          <li class="controlls-item">
-            <input type="number" name="" id="" value="100" class="max-value" />
+          <li class="controls-item">
+            <input
+              type="number"
+              name=""
+              id=""
+              value="100"
+              class="max-value"
+              data-type="max-value"
+              data-for="radiusY"
+            />
             <label>
               <span class="control-name">radiusY</span>
               <input
@@ -94,8 +126,16 @@
             </label>
             <span class="value" data-value="radiusY">0</span>
           </li>
-          <li class="controlls-item">
-            <input type="number" name="" id="" value="360" class="max-value" />
+          <li class="controls-item">
+            <input
+              type="number"
+              name=""
+              id=""
+              value="360"
+              class="max-value"
+              data-type="max-value"
+              data-for="rotation"
+            />
             <label>
               <span class="control-name">rotation</span>
               <input
@@ -111,8 +151,16 @@
             </label>
             <span class="value" data-value="rotation">0</span>
           </li>
-          <li class="controlls-item">
-            <input type="number" name="" id="" value="360" class="max-value" />
+          <li class="controls-item">
+            <input
+              type="number"
+              name=""
+              id=""
+              value="360"
+              class="max-value"
+              data-type="max-value"
+              data-for="startAngle"
+            />
             <label>
               <span class="control-name">startAngle</span>
               <input
@@ -128,8 +176,16 @@
             </label>
             <span class="value" data-value="startAngle">0</span>
           </li>
-          <li class="controlls-item">
-            <input type="number" name="" id="" value="360" class="max-value" />
+          <li class="controls-item">
+            <input
+              type="number"
+              name=""
+              id=""
+              value="360"
+              class="max-value"
+              data-type="max-value"
+              data-for="endAngle"
+            />
             <label>
               <span class="control-name">endAngle</span>
               <input
@@ -145,7 +201,7 @@
             </label>
             <span class="value" data-value="endAngle">0</span>
           </li>
-          <li class="controlls-item">
+          <li class="controls-item">
             <div class="">
               <span class="control-name">counterclockwise</span>
 

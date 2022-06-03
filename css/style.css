@@ -15,7 +15,7 @@
   align-items: center;
 }
 
-.canvas-controlls {
+.canvas-controls {
   margin-bottom: 20px;
 }
 
@@ -27,11 +27,11 @@
   outline: 2px solid #ccc;
 }
 
-.controlls-list {
+.controls-list {
   /* outline: 2px solid rgb(162, 235, 44); */
 }
 
-.controlls-item {
+.controls-item {
   display: flex;
   align-items: center;
   justify-content: space-evenly;

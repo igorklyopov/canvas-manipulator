@@ -4,16 +4,21 @@ function getCanvasEllipseControls(...args) {
 
   // refs
   const canvasContainerRef = document.querySelector(`.${containerClassName}`);
-  const controllsShapeRef = canvasContainerRef.querySelector(
-    '.js-controlls-shape'
+  const controlsShapeRef =
+    canvasContainerRef.querySelector('.js-controls-shape');
+  const controlsCanvasRef = canvasContainerRef.querySelector(
+    '.js-controls-canvas'
   );
-  const controllsCanvasRef = canvasContainerRef.querySelector(
-    '.js-controlls-canvas'
+  const controlsInputRefs =
+    canvasContainerRef.querySelectorAll('.js-control-input');
+  const controlsMaxValueRefs = canvasContainerRef.querySelectorAll(
+    '[data-type="max-value"]'
   );
 
   // canvas
   const canvasRef = document.getElementById('canvas-ellipse');
   const ctx = canvasRef.getContext('2d');
+  //------------
 
   const controlValueRefs = {
     cx: canvasContainerRef.querySelector('[data-value = "cx"]'),
@@ -28,7 +33,20 @@ function getCanvasEllipseControls(...args) {
 
   // get saved params
   const savedShapeParams = JSON.parse(localStorage.getItem('shapeParams'));
+  const savedControlMaxValues = JSON.parse(
+    localStorage.getItem('controlMaxValues')
+  );
   // ------------
+
+  const initialControlMaxValues = {
+    cx: canvasRef.width,
+    cy: canvasRef.height,
+    radiusX: 100,
+    radiusY: 100,
+    rotation: 360,
+    startAngle: 360,
+    endAngle: 360,
+  };
 
   const initialShapeParams = {
     cx: 0,
@@ -41,19 +59,24 @@ function getCanvasEllipseControls(...args) {
     counterclockwise: true,
   };
 
+  const controlMaxValues = savedControlMaxValues ?? initialControlMaxValues;
   const shapeParams = savedShapeParams ?? initialShapeParams;
 
-  controllsShapeRef.addEventListener('input', (e) => {
+  controlsShapeRef.addEventListener('change', (e) => {
     if (e.target.type === 'range') {
-      renderControllsValues(e);
+      renderControlsValues(e);
     }
 
-    setShapeParams(e);
+    if (e.target.dataset.type === 'max-value') {
+      setControlMaxValues(e);
+    } else {
+      setShapeParams(e);
+    }
 
     clearCanvas();
     drawEllipse();
   });
-  controllsShapeRef.addEventListener('mousewheel', (e) => {
+  controlsShapeRef.addEventListener('mousewheel', (e) => {
     if (e.target.type !== 'range') {
       return;
     }
@@ -70,35 +93,14 @@ function getCanvasEllipseControls(...args) {
     }
 
     setShapeParams(e);
-    renderControllsValues(e);
+    renderControlsValues(e);
 
     clearCanvas();
     drawEllipse();
   });
 
+  initControlsValues();
   drawEllipse();
-
-  const controllsInputRefs =
-    canvasContainerRef.querySelectorAll('.js-control-input');
-
-  controllsInputRefs.forEach((inputItem) => {
-    if (!savedShapeParams) return;
-
-    const savedValue = savedShapeParams[inputItem.name];
-
-    if (inputItem.type === 'range') {
-      inputItem.value =
-        inputItem.dataset.type === 'angle'
-          ? convertRadianToGrad(savedValue)
-          : savedValue;
-
-      controlValueRefs[inputItem.name].innerText = inputItem.value;
-    }
-
-    if (inputItem.type === 'radio' && inputItem.value === savedValue) {
-      inputItem.checked = true;
-    }
-  });
 
   // functions
   function clearCanvas() {
@@ -139,8 +141,45 @@ function getCanvasEllipseControls(...args) {
     // ------------
   }
 
-  function renderControllsValues(e) {
+  function renderControlsValues(e) {
     controlValueRefs[e.target.name].innerText = e.target.value;
+  }
+
+  function setControlMaxValues(e) {
+    controlsInputRefs.forEach((controlItem) => {
+      if (controlItem.name === e.target.dataset.for) {
+        controlItem.max = e.target.value;
+        controlMaxValues[controlItem.name] = Number(e.target.value);
+      }
+    });
+
+    localStorage.setItem('controlMaxValues', JSON.stringify(controlMaxValues));
+  }
+
+  function initControlsValues() {
+    controlsInputRefs.forEach((inputItem) => {
+      if (!savedShapeParams) return;
+
+      const savedValue = savedShapeParams[inputItem.name];
+
+      if (inputItem.type === 'range') {
+        inputItem.value =
+          inputItem.dataset.type === 'angle'
+            ? convertRadianToGrad(savedValue)
+            : savedValue;
+
+        inputItem.max = controlMaxValues[inputItem.name];
+
+        controlValueRefs[inputItem.name].innerText = inputItem.value;
+      }
+
+      if (inputItem.type === 'radio' && inputItem.value === savedValue) {
+        inputItem.checked = true;
+      }
+    });
+    controlsMaxValueRefs.forEach((controlItem) => {
+      controlItem.value = controlMaxValues[controlItem.dataset.for];
+    });
   }
 
   // console.log('ctx', ctx);
