@@ -87,7 +87,11 @@ function getCanvasEllipseControls(...args) {
     const savedValue = savedShapeParams[inputItem.name];
 
     if (inputItem.type === 'range') {
-      inputItem.value = savedValue;
+      inputItem.value =
+        inputItem.dataset.type === 'angle'
+          ? convertRadianToGrad(savedValue)
+          : savedValue;
+
       controlValueRefs[inputItem.name].innerText = inputItem.value;
     }
 
@@ -124,6 +128,10 @@ function getCanvasEllipseControls(...args) {
     // set params
     shapeParams[e.target.name] =
       e.target.type === 'range' ? Number(e.target.value) : e.target.value;
+
+    if (e.target.dataset.type === 'angle') {
+      shapeParams[e.target.name] = convertGradToRadian(e.target.value);
+    }
     // ------------
 
     // save params
@@ -139,18 +147,29 @@ function getCanvasEllipseControls(...args) {
 }
 getCanvasEllipseControls('canvas-ellipse');
 
+// utils
+function convertGradToRadian(deg) {
+  return Number(((deg / 180) * Math.PI).toFixed(4));
+}
+
+function convertRadianToGrad(rad) {
+  return Number(((rad * 180) / Math.PI).toFixed());
+}
+// ------------
+
 // <===== ======
 
 // ====== ======>
-
+//
 // <===== ======
 
 // ====== ======>
-
-// <===== =====
+//
+// <====== ======
 
 // ====== ======>
 // <===== ======
 
 // ====== ======>
+//
 // <===== ======
