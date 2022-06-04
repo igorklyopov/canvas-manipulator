@@ -14,15 +14,12 @@ function getCanvasEllipseControls(...args) {
   const controlsMaxValueRefs = canvasContainerRef.querySelectorAll(
     '[data-type="max-value"]'
   );
+  const controlValueRefs = canvasContainerRef.querySelectorAll('[data-value]');
 
   // canvas
   const canvasRef = document.getElementById('canvas-ellipse');
   const ctx = canvasRef.getContext('2d');
   //------------
-
-  const controlValueRefs = canvasContainerRef.querySelectorAll('[data-value]');
-
-  // ------------
 
   // get saved params
   const savedShapeParams = JSON.parse(localStorage.getItem('shapeParams'));
@@ -91,7 +88,31 @@ function getCanvasEllipseControls(...args) {
     clearCanvas();
     drawEllipse();
   });
+  controlsCanvasRef.addEventListener('change', (e) => {
+    switch (e.target.name) {
+      case 'canvas-width':
+        canvasRef.width = e.target.value;
+        break;
 
+      case 'canvas-height':
+        canvasRef.height = e.target.value;
+        break;
+
+      default:
+        break;
+    }
+
+    const canvasParams = {
+      width: canvasRef.width,
+      height: canvasRef.height,
+    };
+
+    localStorage.setItem('canvasParams', JSON.stringify(canvasParams));
+
+    drawEllipse();
+  });
+
+  initCanvasParams();
   initControlsValues();
   drawEllipse();
 
@@ -178,6 +199,34 @@ function getCanvasEllipseControls(...args) {
     controlsMaxValueRefs.forEach((controlItem) => {
       controlItem.value = controlMaxValues[controlItem.dataset.for];
     });
+  }
+
+  function initCanvasParams() {
+    const savedCanvasParams = JSON.parse(localStorage.getItem('canvasParams'));
+
+    if (savedCanvasParams) {
+      canvasRef.width = savedCanvasParams.width;
+      canvasRef.height = savedCanvasParams.height;
+    }
+
+    const canvasControlsInputRefs = canvasContainerRef.querySelectorAll(
+      '[data-name="canvas-control-input"]'
+    );
+
+    for (const inputItem of canvasControlsInputRefs) {
+      switch (inputItem.name) {
+        case 'canvas-width':
+          inputItem.value = savedCanvasParams.width;
+          break;
+
+        case 'canvas-height':
+          inputItem.value = savedCanvasParams.height;
+          break;
+
+        default:
+          break;
+      }
+    }
   }
 
   // console.log('ctx', ctx);
