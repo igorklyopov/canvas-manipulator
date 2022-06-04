@@ -204,10 +204,10 @@ function getCanvasEllipseControls(...args) {
   function initCanvasParams() {
     const savedCanvasParams = JSON.parse(localStorage.getItem('canvasParams'));
 
-    if (savedCanvasParams) {
-      canvasRef.width = savedCanvasParams.width;
-      canvasRef.height = savedCanvasParams.height;
-    }
+    if (!savedCanvasParams) return;
+
+    canvasRef.width = savedCanvasParams.width;
+    canvasRef.height = savedCanvasParams.height;
 
     const canvasControlsInputRefs = canvasContainerRef.querySelectorAll(
       '[data-name="canvas-control-input"]'
