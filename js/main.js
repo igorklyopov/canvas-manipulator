@@ -20,15 +20,8 @@ function getCanvasEllipseControls(...args) {
   const ctx = canvasRef.getContext('2d');
   //------------
 
-  const controlValueRefs = {
-    cx: canvasContainerRef.querySelector('[data-value = "cx"]'),
-    cy: canvasContainerRef.querySelector('[data-value = "cy"]'),
-    radiusX: canvasContainerRef.querySelector('[data-value = "radiusX"]'),
-    radiusY: canvasContainerRef.querySelector('[data-value = "radiusY"]'),
-    rotation: canvasContainerRef.querySelector('[data-value = "rotation"]'),
-    startAngle: canvasContainerRef.querySelector('[data-value = "startAngle"]'),
-    endAngle: canvasContainerRef.querySelector('[data-value = "endAngle"]'),
-  };
+  const controlValueRefs = canvasContainerRef.querySelectorAll('[data-value]');
+
   // ------------
 
   // get saved params
@@ -64,7 +57,7 @@ function getCanvasEllipseControls(...args) {
 
   controlsShapeRef.addEventListener('change', (e) => {
     if (e.target.type === 'range') {
-      renderControlsValues(e);
+      renderControlsValues(e.target);
     }
 
     if (e.target.dataset.type === 'max-value') {
@@ -93,7 +86,7 @@ function getCanvasEllipseControls(...args) {
     }
 
     setShapeParams(e);
-    renderControlsValues(e);
+    renderControlsValues(e.target);
 
     clearCanvas();
     drawEllipse();
@@ -141,8 +134,13 @@ function getCanvasEllipseControls(...args) {
     // ------------
   }
 
-  function renderControlsValues(e) {
-    controlValueRefs[e.target.name].innerText = e.target.value;
+  function renderControlsValues(inputRef) {
+    controlValueRefs.forEach((valueItem) => {
+      if (valueItem.dataset.value === inputRef.name) {
+        valueItem.innerText = inputRef.value;
+        return;
+      }
+    });
   }
 
   function setControlMaxValues(e) {
@@ -170,7 +168,7 @@ function getCanvasEllipseControls(...args) {
 
         inputItem.max = controlMaxValues[inputItem.name];
 
-        controlValueRefs[inputItem.name].innerText = inputItem.value;
+        renderControlsValues(inputItem);
       }
 
       if (inputItem.type === 'radio' && inputItem.value === savedValue) {
