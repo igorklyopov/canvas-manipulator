@@ -135,12 +135,12 @@ function getCanvasEllipseControls(...args) {
   }
 
   function renderControlsValues(inputRef) {
-    controlValueRefs.forEach((valueItem) => {
+    for (const valueItem of controlValueRefs) {
       if (valueItem.dataset.value === inputRef.name) {
         valueItem.innerText = inputRef.value;
         return;
       }
-    });
+    }
   }
 
   function setControlMaxValues(e) {
@@ -155,9 +155,9 @@ function getCanvasEllipseControls(...args) {
   }
 
   function initControlsValues() {
-    controlsInputRefs.forEach((inputItem) => {
-      if (!savedShapeParams) return;
+    if (!savedShapeParams) return;
 
+    controlsInputRefs.forEach((inputItem) => {
       const savedValue = savedShapeParams[inputItem.name];
 
       if (inputItem.type === 'range') {
