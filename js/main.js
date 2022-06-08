@@ -1,4 +1,4 @@
-// ====== ======>
+// ====== Get shape controls ======>
 function getCanvasEllipseControls(...args) {
   const [containerClassName] = args;
 
@@ -17,7 +17,7 @@ function getCanvasEllipseControls(...args) {
   const controlValueRefs = canvasContainerRef.querySelectorAll('[data-value]');
 
   // canvas
-  const canvasRef = document.getElementById('canvas-ellipse');
+  const canvasRef = document.getElementById(containerClassName);
   const ctx = canvasRef.getContext('2d');
   //------------
 
@@ -231,7 +231,6 @@ function getCanvasEllipseControls(...args) {
 
   // console.log('ctx', ctx);
 }
-getCanvasEllipseControls('canvas-ellipse');
 
 // utils
 function convertGradToRadian(deg) {
@@ -243,11 +242,304 @@ function convertRadianToGrad(rad) {
 }
 // ------------
 
-// <===== ======
+// <===== END Get shape controls ======
 
-// ====== ======>
-//
-// <===== ======
+// ====== Get layers ======>
+(() => {
+  const layerHeaderRef = document.getElementById('layer-header');
+  const selectLayerRef = document.getElementById('select-layer');
+  const appContainerRef = document.getElementById('layers-container');
+  const layersRefs = document.getElementsByClassName('js-layer');
+
+  let layerNumber = 0;
+
+  layerHeaderRef.addEventListener('click', (e) => {
+    switch (e.target.dataset.function) {
+      case 'add-layer':
+        renderLayer();
+        showSelectLayers();
+        break;
+
+      case 'delete-layer':
+        deleteLayer();
+        break;
+
+      default:
+        break;
+    }
+  });
+
+  selectLayerRef.addEventListener('change', selectLayer);
+
+  function renderLayer() {
+    layerNumber += 1;
+
+    const layerMarkup = `
+   <div class="canvas-wrap">
+          <ul class="list canvas-controls js-controls-canvas">
+            <li>
+              <label class="canvas-control">
+                <span class="controls-name">width</span>
+                <input type="number" name="canvas-width" value="300" data-name="canvas-control-input"/>
+              </label>
+            </li>
+            <li>
+              <label class="canvas-control">
+                <span class="controls-name">height</span>
+                <input type="number" name="canvas-height" value="150" data-name="canvas-control-input"/>
+              </label>
+            </li>
+          </ul>
+          <canvas id="ellipse-${layerNumber}" class="canvas"></canvas>
+        </div>
+        <ul class="list controls-list js-controls-shape">
+          <li class="controls-item">
+            <input
+              type="number"
+              name="cx-max-value"
+              value="300"
+              class="max-value"
+              data-type="max-value"
+              data-for="cx"
+            />
+            <label>
+              <span class="control-name">cx</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="300"
+                step="1"
+                name="cx"
+                class="js-control-input"
+              />
+            </label>
+            <span class="control-value" data-value="cx">0</span>
+          </li>
+          <li class="controls-item">
+            <input
+              type="number"
+              name="cy-max-value"
+              value="150"
+              class="max-value"
+              data-type="max-value"
+              data-for="cy"
+            />
+            <label>
+              <span class="control-name">cy</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="150"
+                step="1"
+                name="cy"
+                class="js-control-input"
+              />
+            </label>
+            <span class="control-value" data-value="cy">0</span>
+          </li>
+          <li class="controls-item">
+            <input
+              type="number"
+              name="radiusX-max-value"
+              value="100"
+              class="max-value"
+              data-type="max-value"
+              data-for="radiusX"
+            />
+            <label>
+              <span class="control-name">radiusX</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="100"
+                step="1"
+                name="radiusX"
+                class="js-control-input"
+              />
+            </label>
+            <span class="control-value" data-value="radiusX">0</span>
+          </li>
+          <li class="controls-item">
+            <input
+              type="number"
+              name="radiusY-max-value"
+              value="100"
+              class="max-value"
+              data-type="max-value"
+              data-for="radiusY"
+            />
+            <label>
+              <span class="control-name">radiusY</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="100"
+                step="1"
+                name="radiusY"
+                class="js-control-input"
+              />
+            </label>
+            <span class="control-value" data-value="radiusY">0</span>
+          </li>
+          <li class="controls-item">
+            <input
+              type="number"
+              name="rotation-max-value"
+              value="360"
+              class="max-value"
+              data-type="max-value"
+              data-for="rotation"
+            />
+            <label>
+              <span class="control-name">rotation</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="360"
+                step="1"
+                name="rotation"
+                class="js-control-input"
+                data-type="angle"
+              />
+            </label>
+            <span class="control-value" data-value="rotation">0</span>
+          </li>
+          <li class="controls-item">
+            <input
+              type="number"
+              name="startAngle-max-value"
+              value="360"
+              class="max-value"
+              data-type="max-value"
+              data-for="startAngle"
+            />
+            <label>
+              <span class="control-name">startAngle</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="360"
+                step="1"
+                name="startAngle"
+                class="js-control-input"
+                data-type="angle"
+              />
+            </label>
+            <span class="control-value" data-value="startAngle">0</span>
+          </li>
+          <li class="controls-item">
+            <input
+              type="number"
+              name="endAngle-max-value"
+              value="360"
+              class="max-value"
+              data-type="max-value"
+              data-for="endAngle"
+            />
+            <label>
+              <span class="control-name">endAngle</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="360"
+                step="1"
+                name="endAngle"
+                class="js-control-input"
+                data-type="angle"
+              />
+            </label>
+            <span class="control-value" data-value="endAngle">0</span>
+          </li>
+          <li class="controls-item">
+            <div class="">
+              <span class="control-name">counterclockwise</span>
+
+              <label>
+                <span class="">true</span>
+                <input
+                  type="radio"
+                  name="counterclockwise"
+                  value="true"
+                  checked
+                  class="js-control-input"
+                />
+              </label>
+              <label>
+                <span class="">false</span>
+                <input
+                  type="radio"
+                  name="counterclockwise"
+                  value="false"
+                  class="js-control-input"
+                />
+              </label>
+            </div>
+          </li>
+        </ul>
+  `;
+
+    const canvasContainer = `
+  <div class="canvas-ellipse ellipse-${layerNumber} js-layer" style="z-index: ${layerNumber}" data-layer="${layerNumber}" >
+  `;
+    appContainerRef.insertAdjacentHTML('beforeend', canvasContainer);
+
+    const canvasContainerRef = document.querySelector(
+      `.ellipse-${layerNumber}`
+    );
+    canvasContainerRef.insertAdjacentHTML('beforeend', layerMarkup);
+
+    getCanvasEllipseControls(`ellipse-${layerNumber}`);
+  }
+
+  function showSelectLayers() {
+    const selectLayerOption = `
+  <option value="${layerNumber}" selected id="${layerNumber}" class="js-select-layer-option">Layer ${layerNumber}</option>
+  `;
+
+    selectLayerRef.insertAdjacentHTML('afterbegin', selectLayerOption);
+
+    if (selectLayerRef.classList.contains('is-hidden')) {
+      selectLayerRef.classList.remove('is-hidden');
+    }
+  }
+
+  function selectLayer(e) {
+    for (const layerItem of layersRefs) {
+      layerItem.dataset.layer === e.target.value
+        ? (layerItem.style.zIndex = layerNumber + 1)
+        : (layerItem.style.zIndex = layerItem.dataset.layer);
+    }
+  }
+
+  function deleteLayer() {
+    const selectLayerOptionsRefs = selectLayerRef.getElementsByClassName(
+      'js-select-layer-option'
+    );
+
+    let currentLayerNumber = 0;
+
+    for (const selectLayerOption of selectLayerOptionsRefs) {
+      if (selectLayerOption.selected === true) {
+        currentLayerNumber = selectLayerOption.value;
+        selectLayerOption.remove();
+      }
+    }
+
+    for (const layerItem of layersRefs) {
+      if (layerItem.dataset.layer === currentLayerNumber) {
+        layerItem.remove();
+      }
+    }
+  }
+})();
+// <=====END Get layers ======
 
 // ====== ======>
 //
