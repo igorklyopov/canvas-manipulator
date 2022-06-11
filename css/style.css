@@ -86,7 +86,7 @@ h1 {
 .app-wrap {
   position: relative;
 
-  min-height: 436px;
+  min-height: 480px;
 
   outline: 2px dashed darkorange;
   border-radius: 5px;
@@ -132,11 +132,10 @@ h1 {
   justify-content: space-between;
 }
 
-.layer-select{
-
+.layer-select {
 }
 
-.layer-select.is-hidden{
+.layer-select.is-hidden {
   display: none;
 }
 

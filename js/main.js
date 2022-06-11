@@ -36,6 +36,7 @@ function getCanvasEllipseControls(...args) {
     rotation: 360,
     startAngle: 360,
     endAngle: 360,
+    lineWidth: 100,
   };
 
   const initialShapeParams = {
@@ -49,6 +50,7 @@ function getCanvasEllipseControls(...args) {
     counterclockwise: true,
     lineCap: 'butt',
     strokeStyle: '#000000',
+    lineWidth: 2,
   };
 
   const controlMaxValues = savedControlMaxValues ?? initialControlMaxValues;
@@ -125,7 +127,7 @@ function getCanvasEllipseControls(...args) {
 
   function drawEllipse() {
     // ctx.fillStyle = 'green';
-    ctx.lineWidth = 4;
+    ctx.lineWidth = shapeParams.lineWidth;
     ctx.strokeStyle = shapeParams.strokeStyle;
     ctx.lineCap = shapeParams.lineCap;
     ctx.beginPath();
@@ -514,8 +516,31 @@ function convertRadianToGrad(rad) {
           <li class="controls-item">
             <label>
               <span class="control-name">strokeStyle</span>
-              <input type="color" name="strokeStyle" class="js-control-input" />
+              <input type="color" name="strokeStyle" class="js-control-input" title="Choose stroke color" />
               </label>
+          </li>
+          <li class="controls-item">
+            <input
+              type="number"
+              name="lineWidth-max-value"
+              value="360"
+              class="max-value"
+              data-type="max-value"
+              data-for="lineWidth"
+            />
+            <label>
+              <span class="control-name">lineWidth</span>
+              <input
+                type="range"
+                value="0"
+                min="0"
+                max="100"
+                step="1"
+                name="lineWidth"
+                class="js-control-input"
+              />
+            </label>
+            <span class="control-value" data-value="lineWidth">0</span>
           </li>
         </ul>
   `;
