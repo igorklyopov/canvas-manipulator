@@ -48,6 +48,7 @@ function getCanvasEllipseControls(...args) {
     endAngle: 0,
     counterclockwise: true,
     lineCap: 'butt',
+    strokeStyle: '#000000',
   };
 
   const controlMaxValues = savedControlMaxValues ?? initialControlMaxValues;
@@ -125,7 +126,7 @@ function getCanvasEllipseControls(...args) {
   function drawEllipse() {
     // ctx.fillStyle = 'green';
     ctx.lineWidth = 4;
-    ctx.strokeStyle = 'green';
+    ctx.strokeStyle = shapeParams.strokeStyle;
     ctx.lineCap = shapeParams.lineCap;
     ctx.beginPath();
     ctx.ellipse(
@@ -198,6 +199,8 @@ function getCanvasEllipseControls(...args) {
       if (inputItem.type === 'radio' && inputItem.value === savedValue) {
         inputItem.checked = true;
       }
+
+      inputItem.value = savedValue;
     });
     controlsMaxValueRefs.forEach((controlItem) => {
       controlItem.value = controlMaxValues[controlItem.dataset.for];
@@ -507,6 +510,12 @@ function convertRadianToGrad(rad) {
                 />
               </label>
             </div>
+          </li>
+          <li class="controls-item">
+            <label>
+              <span class="control-name">strokeStyle</span>
+              <input type="color" name="strokeStyle" class="js-control-input" />
+              </label>
           </li>
         </ul>
   `;
