@@ -118,6 +118,7 @@ function getCanvasEllipseControls(...args) {
 
   initCanvasParams();
   initControlsValues();
+  initControlsMaxValues();
   drawEllipse();
 
   // functions
@@ -187,23 +188,30 @@ function getCanvasEllipseControls(...args) {
     controlsInputRefs.forEach((inputItem) => {
       const savedValue = savedShapeParams[inputItem.name];
 
-      if (inputItem.type === 'range') {
-        inputItem.value =
-          inputItem.dataset.type === 'angle'
-            ? convertRadianToGrad(savedValue)
-            : savedValue;
+      switch (inputItem.type) {
+        case 'range':
+          inputItem.value =
+            inputItem.dataset.type === 'angle'
+              ? convertRadianToGrad(savedValue)
+              : savedValue;
 
-        inputItem.max = controlMaxValues[inputItem.name];
+          inputItem.max = controlMaxValues[inputItem.name];
 
-        renderControlsValues(inputItem);
+          renderControlsValues(inputItem);
+          break;
+
+        case 'radio':
+          inputItem.checked = inputItem.value === savedValue;
+          break;
+
+        default:
+          inputItem.value = savedValue;
+          break;
       }
-
-      if (inputItem.type === 'radio' && inputItem.value === savedValue) {
-        inputItem.checked = true;
-      }
-
-      inputItem.value = savedValue;
     });
+  }
+
+  function initControlsMaxValues() {
     controlsMaxValueRefs.forEach((controlItem) => {
       controlItem.value = controlMaxValues[controlItem.dataset.for];
     });
