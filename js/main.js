@@ -519,6 +519,15 @@ function convertRadianToGrad(rad) {
                   class="js-control-input"
                 />
               </label>
+              <label>
+                <span class="">square</span>
+                <input
+                  type="radio"
+                  name="lineCap"
+                  value="square"
+                  class="js-control-input"
+                />
+              </label>
             </div>
           </li>
           <li class="controls-item">
