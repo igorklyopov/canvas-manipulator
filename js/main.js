@@ -67,6 +67,14 @@ function getCanvasEllipseControls(...args) {
       setShapeParams(e);
     }
 
+    if (e.target.type === 'color') {
+      for (const inputItem of controlsInputRefs) {
+        if (inputItem.name === e.target.name && inputItem.type === 'text') {
+          inputItem.value = e.target.value;
+        }
+      }
+    }
+
     clearCanvas();
     drawEllipse();
   });
@@ -142,7 +150,7 @@ function getCanvasEllipseControls(...args) {
       shapeParams.endAngle,
       shapeParams.counterclockwise
     );
-    ctx.stroke();
+    if (shapeParams.lineWidth > 0) ctx.stroke();
     // ctx.fill();
     ctx.closePath();
   }
@@ -155,6 +163,7 @@ function getCanvasEllipseControls(...args) {
     if (e.target.dataset.type === 'angle') {
       shapeParams[e.target.name] = convertGradToRadian(e.target.value);
     }
+
     // ------------
 
     // save params
@@ -322,7 +331,6 @@ function convertRadianToGrad(rad) {
               <span class="control-name">cx</span>
               <input
                 type="range"
-                value="0"
                 min="0"
                 max="300"
                 step="1"
@@ -345,7 +353,6 @@ function convertRadianToGrad(rad) {
               <span class="control-name">cy</span>
               <input
                 type="range"
-                value="0"
                 min="0"
                 max="150"
                 step="1"
@@ -368,7 +375,6 @@ function convertRadianToGrad(rad) {
               <span class="control-name">radiusX</span>
               <input
                 type="range"
-                value="0"
                 min="0"
                 max="100"
                 step="1"
@@ -391,7 +397,6 @@ function convertRadianToGrad(rad) {
               <span class="control-name">radiusY</span>
               <input
                 type="range"
-                value="0"
                 min="0"
                 max="100"
                 step="1"
@@ -414,7 +419,6 @@ function convertRadianToGrad(rad) {
               <span class="control-name">rotation</span>
               <input
                 type="range"
-                value="0"
                 min="0"
                 max="360"
                 step="1"
@@ -438,7 +442,6 @@ function convertRadianToGrad(rad) {
               <span class="control-name">startAngle</span>
               <input
                 type="range"
-                value="0"
                 min="0"
                 max="360"
                 step="1"
@@ -462,7 +465,6 @@ function convertRadianToGrad(rad) {
               <span class="control-name">endAngle</span>
               <input
                 type="range"
-                value="0"
                 min="0"
                 max="360"
                 step="1"
@@ -483,7 +485,6 @@ function convertRadianToGrad(rad) {
                   type="radio"
                   name="counterclockwise"
                   value="true"
-                  checked
                   class="js-control-input"
                 />
               </label>
@@ -531,9 +532,12 @@ function convertRadianToGrad(rad) {
             </div>
           </li>
           <li class="controls-item">
+            <span class="control-name">strokeStyle</span>
             <label>
-              <span class="control-name">strokeStyle</span>
               <input type="color" name="strokeStyle" class="js-control-input" title="Choose stroke color" />
+              </label>
+              <label>
+              <input type="text" name="strokeStyle" class="js-control-input" title="Input stroke color" />
               </label>
           </li>
           <li class="controls-item">
@@ -549,7 +553,6 @@ function convertRadianToGrad(rad) {
               <span class="control-name">lineWidth</span>
               <input
                 type="range"
-                value="0"
                 min="0"
                 max="100"
                 step="1"
@@ -563,8 +566,8 @@ function convertRadianToGrad(rad) {
   `;
 
     const canvasContainer = `
-  <div class="canvas-ellipse ellipse-${layerNumber} js-layer" style="z-index: ${layerNumber}" data-layer="${layerNumber}" >
-  `;
+      <div class="canvas-ellipse ellipse-${layerNumber} js-layer" style="z-index: ${layerNumber}" data-layer="${layerNumber}" >
+    `;
     appContainerRef.insertAdjacentHTML('beforeend', canvasContainer);
 
     const canvasContainerRef = document.querySelector(
@@ -577,8 +580,8 @@ function convertRadianToGrad(rad) {
 
   function showSelectLayers() {
     const selectLayerOption = `
-  <option value="${layerNumber}" selected id="${layerNumber}" class="js-select-layer-option">Layer ${layerNumber}</option>
-  `;
+      <option value="${layerNumber}" selected id="${layerNumber}" class="js-select-layer-option">Layer ${layerNumber}</option>
+    `;
 
     selectLayerRef.insertAdjacentHTML('afterbegin', selectLayerOption);
 
