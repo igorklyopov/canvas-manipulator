@@ -135,7 +135,7 @@ function getCanvasEllipseControls(...args) {
   }
 
   function drawEllipse() {
-    // ctx.fillStyle = 'green';
+    // ctx.fillStyle = 'red';
     ctx.lineWidth = shapeParams.lineWidth;
     ctx.strokeStyle = shapeParams.strokeStyle;
     ctx.lineCap = shapeParams.lineCap;
@@ -164,6 +164,9 @@ function getCanvasEllipseControls(...args) {
       shapeParams[e.target.name] = convertGradToRadian(e.target.value);
     }
 
+    if (e.target.dataset.type === 'boolean') {
+      shapeParams[e.target.name] = e.target.value === 'true' ? true : false;
+    }
     // ------------
 
     // save params
@@ -210,7 +213,10 @@ function getCanvasEllipseControls(...args) {
           break;
 
         case 'radio':
-          inputItem.checked = inputItem.value === savedValue;
+          const radioInputValue =
+            typeof savedValue === 'boolean' ? String(savedValue) : savedValue;
+
+          inputItem.checked = inputItem.value === radioInputValue;
           break;
 
         default:
@@ -485,6 +491,7 @@ function convertRadianToGrad(rad) {
                   type="radio"
                   name="counterclockwise"
                   value="true"
+                  data-type="boolean"
                   class="js-control-input"
                 />
               </label>
@@ -494,6 +501,7 @@ function convertRadianToGrad(rad) {
                   type="radio"
                   name="counterclockwise"
                   value="false"
+                  data-type="boolean"
                   class="js-control-input"
                 />
               </label>
