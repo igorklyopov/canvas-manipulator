@@ -68,6 +68,10 @@ select {
 /* === === === */
 
 /* ====== ======> */
+body {
+  padding-bottom: 30px; /* ? */
+}
+
 h1 {
   text-align: center;
 }
@@ -86,7 +90,7 @@ h1 {
 .app-wrap {
   position: relative;
 
-  min-height: 480px;
+  min-height: 550px;
 
   outline: 2px dashed darkorange;
   border-radius: 5px;
@@ -181,6 +185,11 @@ h1 {
 .control-name {
   display: block;
   text-align: center;
+}
+
+.control-input{
+  
+  cursor: pointer;
 }
 
 .control-value {

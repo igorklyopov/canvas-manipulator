@@ -51,6 +51,8 @@ function getCanvasEllipseControls(...args) {
     lineCap: 'butt',
     strokeStyle: '#000000',
     lineWidth: 2,
+    fill: true,
+    fillStyle: '#ffffff',
   };
 
   const controlMaxValues = savedControlMaxValues ?? initialControlMaxValues;
@@ -78,10 +80,13 @@ function getCanvasEllipseControls(...args) {
     clearCanvas();
     drawEllipse();
   });
+
   controlsShapeRef.addEventListener('mousewheel', (e) => {
     if (e.target.type !== 'range') {
       return;
     }
+
+    e.preventDefault();
 
     const maxValue = Number(e.target.max);
     const minValue = Number(e.target.min);
@@ -100,6 +105,7 @@ function getCanvasEllipseControls(...args) {
     clearCanvas();
     drawEllipse();
   });
+
   controlsCanvasRef.addEventListener('change', (e) => {
     switch (e.target.name) {
       case 'canvas-width':
@@ -135,7 +141,7 @@ function getCanvasEllipseControls(...args) {
   }
 
   function drawEllipse() {
-    // ctx.fillStyle = 'red';
+    ctx.fillStyle = shapeParams.fillStyle;
     ctx.lineWidth = shapeParams.lineWidth;
     ctx.strokeStyle = shapeParams.strokeStyle;
     ctx.lineCap = shapeParams.lineCap;
@@ -151,7 +157,7 @@ function getCanvasEllipseControls(...args) {
       shapeParams.counterclockwise
     );
     if (shapeParams.lineWidth > 0) ctx.stroke();
-    // ctx.fill();
+    if (shapeParams.fill) ctx.fill();
     ctx.closePath();
   }
 
@@ -164,8 +170,12 @@ function getCanvasEllipseControls(...args) {
       shapeParams[e.target.name] = convertGradToRadian(e.target.value);
     }
 
-    if (e.target.dataset.type === 'boolean') {
-      shapeParams[e.target.name] = e.target.value === 'true' ? true : false;
+    if (e.target.type === 'radio' && e.target.dataset.type === 'boolean') {
+      shapeParams[e.target.name] = e.target.value === 'true';
+    }
+
+    if (e.target.type === 'checkbox' && e.target.dataset.type === 'boolean') {
+      shapeParams[e.target.name] = e.target.checked;
     }
     // ------------
 
@@ -217,6 +227,10 @@ function getCanvasEllipseControls(...args) {
             typeof savedValue === 'boolean' ? String(savedValue) : savedValue;
 
           inputItem.checked = inputItem.value === radioInputValue;
+          break;
+
+        case 'checkbox':
+          if (typeof savedValue === 'boolean') inputItem.checked = savedValue;
           break;
 
         default:
@@ -272,7 +286,6 @@ function convertRadianToGrad(rad) {
   return Number(((rad * 180) / Math.PI).toFixed());
 }
 // ------------
-
 // <===== END Get shape controls ======
 
 // ====== Get layers ======>
@@ -306,7 +319,7 @@ function convertRadianToGrad(rad) {
     layerNumber += 1;
 
     const layerMarkup = `
-   <div class="canvas-wrap">
+        <div class="canvas-wrap">
           <ul class="list canvas-controls js-controls-canvas">
             <li>
               <label class="canvas-control">
@@ -341,7 +354,7 @@ function convertRadianToGrad(rad) {
                 max="300"
                 step="1"
                 name="cx"
-                class="js-control-input"
+                class="control-input js-control-input"
               />
             </label>
             <span class="control-value" data-value="cx">0</span>
@@ -363,7 +376,7 @@ function convertRadianToGrad(rad) {
                 max="150"
                 step="1"
                 name="cy"
-                class="js-control-input"
+                class="control-input js-control-input"
               />
             </label>
             <span class="control-value" data-value="cy">0</span>
@@ -385,7 +398,7 @@ function convertRadianToGrad(rad) {
                 max="100"
                 step="1"
                 name="radiusX"
-                class="js-control-input"
+                class="control-input js-control-input"
               />
             </label>
             <span class="control-value" data-value="radiusX">0</span>
@@ -407,7 +420,7 @@ function convertRadianToGrad(rad) {
                 max="100"
                 step="1"
                 name="radiusY"
-                class="js-control-input"
+                class="control-input js-control-input"
               />
             </label>
             <span class="control-value" data-value="radiusY">0</span>
@@ -429,7 +442,7 @@ function convertRadianToGrad(rad) {
                 max="360"
                 step="1"
                 name="rotation"
-                class="js-control-input"
+                class="control-input js-control-input"
                 data-type="angle"
               />
             </label>
@@ -452,7 +465,7 @@ function convertRadianToGrad(rad) {
                 max="360"
                 step="1"
                 name="startAngle"
-                class="js-control-input"
+                class="control-input js-control-input"
                 data-type="angle"
               />
             </label>
@@ -475,7 +488,7 @@ function convertRadianToGrad(rad) {
                 max="360"
                 step="1"
                 name="endAngle"
-                class="js-control-input"
+                class="control-input js-control-input"
                 data-type="angle"
               />
             </label>
@@ -492,7 +505,7 @@ function convertRadianToGrad(rad) {
                   name="counterclockwise"
                   value="true"
                   data-type="boolean"
-                  class="js-control-input"
+                  class="control-input js-control-input"
                 />
               </label>
               <label>
@@ -502,7 +515,7 @@ function convertRadianToGrad(rad) {
                   name="counterclockwise"
                   value="false"
                   data-type="boolean"
-                  class="js-control-input"
+                  class="control-input js-control-input"
                 />
               </label>
               <li class="controls-item">
@@ -516,7 +529,7 @@ function convertRadianToGrad(rad) {
                   name="lineCap"
                   value="butt"
                   checked
-                  class="js-control-input"
+                  class="control-input js-control-input"
                 />
               </label>
               <label>
@@ -525,7 +538,7 @@ function convertRadianToGrad(rad) {
                   type="radio"
                   name="lineCap"
                   value="round"
-                  class="js-control-input"
+                  class="control-input js-control-input"
                 />
               </label>
               <label>
@@ -534,7 +547,7 @@ function convertRadianToGrad(rad) {
                   type="radio"
                   name="lineCap"
                   value="square"
-                  class="js-control-input"
+                  class="control-input js-control-input"
                 />
               </label>
             </div>
@@ -542,10 +555,10 @@ function convertRadianToGrad(rad) {
           <li class="controls-item">
             <span class="control-name">strokeStyle</span>
             <label>
-              <input type="color" name="strokeStyle" class="js-control-input" title="Choose stroke color" />
+              <input type="color" name="strokeStyle" class="control-input js-control-input" title="Choose stroke color" />
               </label>
               <label>
-              <input type="text" name="strokeStyle" class="js-control-input" title="Input stroke color" />
+              <input type="text" name="strokeStyle" class="control-input js-control-input" title="Input stroke color" />
               </label>
           </li>
           <li class="controls-item">
@@ -565,13 +578,26 @@ function convertRadianToGrad(rad) {
                 max="100"
                 step="1"
                 name="lineWidth"
-                class="js-control-input"
+                class="control-input js-control-input"
               />
             </label>
             <span class="control-value" data-value="lineWidth">0</span>
           </li>
+          <li class="controls-item">
+            <span class="control-name">fillStyle</span>
+            <label>
+             <span class="control-name">fill</span>
+              <input type="checkbox" name="fill" class="control-input js-control-input" data-type="boolean" >
+            </label>
+            <label>
+              <input type="color" name="fillStyle" class="control-input js-control-input" title="Choose fill color" />
+              </label>
+              <label>
+              <input type="text" name="fillStyle" class="control-input js-control-input" title="Input fill color" />
+              </label>
+          </li>
         </ul>
-  `;
+    `;
 
     const canvasContainer = `
       <div class="canvas-ellipse ellipse-${layerNumber} js-layer" style="z-index: ${layerNumber}" data-layer="${layerNumber}" >
@@ -614,7 +640,7 @@ function convertRadianToGrad(rad) {
     let currentLayerNumber = 0;
 
     for (const selectLayerOption of selectLayerOptionsRefs) {
-      if (selectLayerOption.selected === true) {
+      if (selectLayerOption.selected) {
         currentLayerNumber = selectLayerOption.value;
         selectLayerOption.remove();
       }
@@ -627,15 +653,16 @@ function convertRadianToGrad(rad) {
     }
   }
 })();
-// <=====END Get layers ======
+// <===== END Get layers ======
 
 // ====== ======>
 //
 // <====== ======
 
 // ====== ======>
-// <===== ======
+//
+// <====== ======
 
 // ====== ======>
 //
-// <===== ======
+// <====== ======
