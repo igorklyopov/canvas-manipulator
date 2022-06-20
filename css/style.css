@@ -87,7 +87,7 @@ h1 {
   margin: 0 auto 20px auto; */
 }
 
-.app-wrap {
+.layers_list {
   position: relative;
 
   min-height: 550px;
@@ -108,13 +108,8 @@ h1 {
 /* <===== ====== */
 
 /* ====== ======> */
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
 
-.canvas-ellipse {
+.layers_item {
   position: absolute;
   top: 0;
   left: 0;
@@ -125,7 +120,7 @@ h1 {
   align-items: center;
 }
 
-.canvas-wrap {
+.canvas_wrap {
   margin-right: 30px;
   margin-left: 10px;
 }
@@ -150,7 +145,7 @@ h1 {
 .delete-layer-btn {
 }
 
-.canvas-controls {
+.canvas_controls_list {
   margin-bottom: 20px;
 
   background-color: #ccc;
@@ -164,7 +159,7 @@ h1 {
   outline: 2px solid #ccc;
 }
 
-.controls-list {
+.shape_controls_list {
   /* outline: 2px solid rgb(162, 235, 44); */
 
   background-color: #ccc;
@@ -187,8 +182,7 @@ h1 {
   text-align: center;
 }
 
-.control-input{
-  
+.control-input {
   cursor: pointer;
 }
 

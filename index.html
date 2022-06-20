@@ -11,9 +11,21 @@
     <h1>Canvas manipulator</h1>
 
     <div class="container layer-header" id="layer-header">
-      <button type="button" class="add-layer-btn" data-function="add-layer">
-        Add layer
-      </button>
+      <div class="">
+        <button type="button" class="add-layer-btn" data-function="add-layer">
+          Add shape
+        </button>
+        <select
+          name="select-shape"
+          id="select-shape"
+          data-function="select-shape"
+          class="shape-select"
+        >
+          <option value="ellipse">Ellipse</option>
+          <option value="rectangle">Rectangle</option>
+          <option value="line">Line</option>
+        </select>
+      </div>
 
       <select
         name="select-layer"
@@ -21,6 +33,11 @@
         data-function="select-layer"
         class="layer-select is-hidden"
       ></select>
+
+      <button type="button" class="copy-layer-btn" data-function="copy-layer">
+        Copy layer
+      </button>
+
       <button
         type="button"
         class="delete-layer-btn"
@@ -30,9 +47,10 @@
       </button>
     </div>
 
-    <div class="container app-wrap" id="layers-container"></div>
-    
-
-    <script src="../js/main.js"></script>
+    <ul class="container layers_list" id="layers_container"></ul>
+    <script src="./js/utils/angleConvert.js"></script>
+    <script src="./js/controlsMarkup.js"></script>
+    <script src="./js/drawShape.js"></script>
+    <script src="./js/main.js"></script>
   </body>
 </html>
