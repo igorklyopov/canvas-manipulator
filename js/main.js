@@ -80,7 +80,6 @@ function saveLayersData() {
 
   if (savedLayersData && savedLayersData.length > 0) {
     LAYERS_DATA = savedLayersData;
-    // CURRENT_LAYER_ID = LAYERS_DATA[LAYERS_DATA.length - 1].id;
 
     const maxLayerNumber = LAYERS_DATA.reduce((prevValue, layer) => {
       const layerNumber = Number(layer.name.replace(/[a-z]* /, ''));
@@ -113,8 +112,8 @@ function saveLayersData() {
         break;
 
       case 'delete-layer':
-        deleteLayer(CURRENT_LAYER_ID);
-        deleteSelectLayerOption(CURRENT_LAYER_ID);
+        deleteLayer(selectLayerRef.value);
+        deleteSelectLayerOption(selectLayerRef.value);
         break;
 
       default:
@@ -137,7 +136,7 @@ function saveLayersData() {
     }
   }
 
-  const ellipseCtrlParamsDefault = {
+  /*const ellipseCtrlParamsDefault = {
     cx: { value: 0, maxValue: 100 },
     cy: { value: 0, maxValue: 100 },
     radiusX: { value: 0, maxValue: 100 },
@@ -151,7 +150,7 @@ function saveLayersData() {
     lineWidth: { value: 2, maxValue: 100 },
     fill: { value: true },
     fillStyle: { value: '#ffffff' },
-  };
+  };*/
 
   function addLayer(shapeType) {
     const layerId = `${Date.now()}`;
@@ -552,22 +551,24 @@ function saveLayersData() {
       }
     }
 
-    console.log(LAYERS_DATA);
-
-    // LAYERS_DATA = LAYERS_DATA.filter((layerItem) => layerItem.id !== layerId);
-    // saveLayersData();
+    LAYERS_DATA = LAYERS_DATA.filter((layerItem) => layerItem.id !== layerId);
+    saveLayersData();
   }
 
   function deleteSelectLayerOption(layerId) {
     const selectLayerOptionsRefs = selectLayerRef.getElementsByClassName(
       'js-select-layer-option'
-    );
+    ); // or const selectLayerOptionsRefs = selectLayerRef.options
 
     for (const selectLayerOption of selectLayerOptionsRefs) {
       if (selectLayerOption.selected) {
         layerId = selectLayerOption.value;
         selectLayerOption.remove();
       }
+    }
+
+    if (selectLayerRef.children.length < 1) {
+      selectLayerRef.classList.add('is-hidden');
     }
   }
 })();
