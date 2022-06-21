@@ -53,8 +53,7 @@ const testLayerData = [
     lineWidth: 100,
   
 }};*/
-const LAYERS_DATA = [];
-let CURRENT_LAYER_ID = null;
+let LAYERS_DATA = [];
 
 function getLayersData() {
   return JSON.parse(localStorage.getItem('layers'));
@@ -65,24 +64,38 @@ function saveLayersData() {
 }
 // <====== ======
 
-// ====== Get shape controls ======>
-//
-// <===== END Get shape controls ======
-
 // ====== Get layers ======>
 (() => {
+  // refs
   const layerHeaderRef = document.getElementById('layer-header');
   const selectLayerRef = document.getElementById('select-layer');
   const selectShapeRef = document.getElementById('select-shape');
   const layersContainerRef = document.getElementById('layers_container');
   const layersRefs = document.getElementsByClassName('js-layer');
 
-  let LAYER_NUMBER = LAYERS_DATA.length + 1;
+  let CURRENT_LAYER_ID = null;
+
+  let LAYER_NUMBER =
+    LAYERS_DATA.length === 0 ? LAYERS_DATA.length + 1 : LAYERS_DATA.length;
 
   if (savedLayersData && savedLayersData.length > 0) {
-    console.log('savedLayersData', savedLayersData);
-    renderLayer(savedLayersData);
-    renderSelectLayerOptions(savedLayersData);
+    LAYERS_DATA = savedLayersData;
+    // CURRENT_LAYER_ID = LAYERS_DATA[LAYERS_DATA.length - 1].id;
+
+    const maxLayerNumber = LAYERS_DATA.reduce((prevValue, layer) => {
+      const layerNumber = Number(layer.name.replace(/[a-z]* /, ''));
+
+      if (layerNumber > prevValue) {
+        prevValue = layerNumber;
+      }
+      return prevValue;
+    }, 0);
+
+    LAYER_NUMBER = maxLayerNumber + 1;
+
+    renderLayers(LAYERS_DATA);
+    controlLayers(LAYERS_DATA);
+    renderSelectLayerOptions(LAYERS_DATA);
   }
 
   layerHeaderRef.addEventListener('click', onHeaderBtnClick);
@@ -92,8 +105,6 @@ function saveLayersData() {
   function onHeaderBtnClick(e) {
     switch (e.target.dataset.function) {
       case 'add-layer':
-        // renderLayer(selectShapeRef.value);
-
         addLayer(selectShapeRef.value);
         break;
 
@@ -102,7 +113,8 @@ function saveLayersData() {
         break;
 
       case 'delete-layer':
-        deleteLayer();
+        deleteLayer(CURRENT_LAYER_ID);
+        deleteSelectLayerOption(CURRENT_LAYER_ID);
         break;
 
       default:
@@ -113,21 +125,17 @@ function saveLayersData() {
   function onHeaderInputChange(e) {
     switch (e.target.dataset.function) {
       case 'select-shape':
-        // renderLayer(e.target.value);
         addLayer(e.target.value);
         break;
 
       case 'select-layer':
-        // showSelectLayers();
+        selectLayer(e);
         break;
 
       default:
         break;
     }
   }
-
-  selectLayerRef.addEventListener('change', selectLayer);
-  // selectShapeRef.addEventListener('change', addLayer);
 
   const ellipseCtrlParamsDefault = {
     cx: { value: 0, maxValue: 100 },
@@ -146,25 +154,26 @@ function saveLayersData() {
   };
 
   function addLayer(shapeType) {
-    // if (LAYERS_DATA.length > 0) saveLayersData();
-
-    LAYER_NUMBER += 1;
-
-    const layerId = `${shapeType}-${LAYER_NUMBER}`;
+    const layerId = `${Date.now()}`;
 
     CURRENT_LAYER_ID = layerId;
 
     const layerData = {};
 
     layerData.id = layerId;
+    layerData.name = `${shapeType} ${LAYER_NUMBER}`;
     layerData.type = shapeType;
-    // layerData.shapeParams = shapeParamsDefault[shapeType];
-    LAYERS_DATA.unshift(layerData);
-    renderLayer(LAYERS_DATA.slice(0, 1));
-    renderSelectLayerOptions(LAYERS_DATA.slice(0, 1));
+
+    LAYERS_DATA.push(layerData);
+
+    const newLayerData = LAYERS_DATA.slice(LAYERS_DATA.length - 1);
+    renderLayers(newLayerData);
+    renderSelectLayerOptions(newLayerData);
+
+    LAYER_NUMBER += 1;
   }
 
-  function renderLayer(data) {
+  function renderLayers(data) {
     const layersMarkup = data.map((layerItem) => {
       const layerItemEl = document.createElement('li');
       layerItemEl.setAttribute('id', layerItem.id);
@@ -208,12 +217,11 @@ function saveLayersData() {
         controlsMarkup[layerItem.type]
       );
 
-      // controlLayer(layerItem);
-
       return layerItemEl;
     });
 
     layersContainerRef.append(...layersMarkup);
+    controlLayers(data);
 
     function initControlsValues() {
       if (!savedShapeParams) return;
@@ -252,270 +260,273 @@ function saveLayersData() {
     }
   }
 
-  function controlLayer(layerData) {
-    // refs
-    const layerRef = document.getElementById(layerData.id);
-    const controlsShapeRef = layerRef.querySelector('.js_controls_shape');
-    const controlsCanvasRef = layerRef.querySelector('.js_controls_canvas');
-    const controlsInputRefs = layerRef.querySelectorAll('.js_control_input');
-    const controlsMaxValueRefs = layerRef.querySelectorAll(
-      '[data-type="max-value"]'
-    );
-    const controlValueRefs = layerRef.querySelectorAll('[data-value]');
+  function controlLayers(data) {
+    data.forEach((layerItem) => {
+      // refs
+      const layerRef = document.getElementById(layerItem.id);
+      const controlsShapeRef = layerRef.querySelector('.js_controls_shape');
+      const controlsCanvasRef = layerRef.querySelector('.js_controls_canvas');
+      const controlsInputRefs = layerRef.querySelectorAll('.js_control_input');
+      const controlsMaxValueRefs = layerRef.querySelectorAll(
+        '[data-type="max-value"]'
+      );
+      const controlValueRefs = layerRef.querySelectorAll('[data-value]');
 
-    // canvas
-    const canvasRef = layerRef.querySelector('.js-canvas');
-    const canvasContext = canvasRef.getContext('2d');
-    //------------
+      // canvas
+      const canvasRef = layerRef.querySelector('.js-canvas');
+      const canvasContext = canvasRef.getContext('2d');
+      //------------
 
-    const shapeType = layerRef.dataset.shape;
+      const shapeType = layerRef.dataset.shape;
 
-    const ellipseShapeParamsDefault = {
-      cx: 100,
-      cy: 100,
-      radiusX: 50,
-      radiusY: 50,
-      rotation: 0,
-      startAngle: 2,
-      endAngle: 0,
-      counterclockwise: true,
-      lineCap: 'butt',
-      strokeStyle: '#000000',
-      lineWidth: 2,
-      fill: true,
-      fillStyle: 'green',
-    };
-
-    // drawShape(canvasContext, shapeType, ellipseShapeParamsDefault);
-    ////////////////////////////////
-
-    // get saved params
-
-    const savedControlMaxValues = null; //for test
-    // const savedShapeParams = null; //for test
-    const savedShapeParams = layerData.shapeParams;
-    console.log('savedShapeParams', savedShapeParams);
-    // ------------
-
-    const initialControlMaxValues = {
-      cx: canvasRef.width,
-      cy: canvasRef.height,
-      radiusX: 100,
-      radiusY: 100,
-      rotation: 360,
-      startAngle: 360,
-      endAngle: 360,
-      lineWidth: 100,
-    };
-
-    const initialShapeParams = {
-      cx: 0,
-      cy: 0,
-      radiusX: 0,
-      radiusY: 0,
-      rotation: 0,
-      startAngle: 0,
-      endAngle: 0,
-      counterclockwise: true,
-      lineCap: 'butt',
-      strokeStyle: '#000000',
-      lineWidth: 0,
-      fill: false,
-      fillStyle: '#000000',
-    };
-
-    const controlMaxValues = savedControlMaxValues ?? initialControlMaxValues;
-    const shapeParams = savedShapeParams ?? initialShapeParams;
-
-    controlsShapeRef.addEventListener('change', onShapeCtrlChange);
-    controlsShapeRef.addEventListener('mousewheel', onShapeCtrlScroll);
-    controlsCanvasRef.addEventListener('change', onCanvasCtrlChange);
-
-    // initCanvasParams();
-    // initControlsValues();
-    // initControlsMaxValues();
-    renderShape(shapeParams);
-
-    // functions
-
-    function renderShape(shapeParams) {
-      return drawShape(canvasContext, shapeType, shapeParams);
-    }
-
-    function onShapeCtrlChange(e) {
-      if (e.target.type === 'range') {
-        renderControlsValues(e.target);
-      }
-
-      if (e.target.dataset.type === 'max-value') {
-        setControlMaxValues(e);
-      } else {
-        setShapeParams(e);
-      }
-
-      if (e.target.type === 'color') {
-        for (const inputItem of controlsInputRefs) {
-          if (inputItem.name === e.target.name && inputItem.type === 'text') {
-            inputItem.value = e.target.value;
-          }
-        }
-      }
-
-      clearCanvas();
-      renderShape(shapeParams);
-    }
-
-    function onShapeCtrlScroll(e) {
-      if (e.target.type !== 'range') {
-        return;
-      }
-
-      e.preventDefault();
-
-      const maxValue = Number(e.target.max);
-      const minValue = Number(e.target.min);
-      const step = Number(e.target.step);
-      const currentValue = Number(e.target.value);
-
-      if (e.deltaY < 0 && currentValue < maxValue) {
-        e.target.value = currentValue + step;
-      } else if (e.deltaY > 0 && currentValue > minValue) {
-        e.target.value = currentValue - step;
-      }
-
-      setShapeParams(e);
-      renderControlsValues(e.target);
-
-      clearCanvas();
-      renderShape(shapeParams);
-    }
-
-    function onCanvasCtrlChange(e) {
-      switch (e.target.name) {
-        case 'canvas-width':
-          canvasRef.width = e.target.value;
-          break;
-
-        case 'canvas-height':
-          canvasRef.height = e.target.value;
-          break;
-
-        default:
-          break;
-      }
-
-      const canvasParams = {
-        width: canvasRef.width,
-        height: canvasRef.height,
+      const ellipseShapeParamsDefault = {
+        cx: 100,
+        cy: 100,
+        radiusX: 50,
+        radiusY: 50,
+        rotation: 0,
+        startAngle: 2,
+        endAngle: 0,
+        counterclockwise: true,
+        lineCap: 'butt',
+        strokeStyle: '#000000',
+        lineWidth: 2,
+        fill: true,
+        fillStyle: 'green',
       };
 
-      localStorage.setItem('canvasParams', JSON.stringify(canvasParams));
+      // get saved params
+      const savedControlMaxValues = null; //for test
+      // const savedShapeParams = null; //for test
+      const savedShapeParams = layerItem.shapeParams;
+      // ------------
 
+      const initialControlMaxValues = {
+        cx: canvasRef.width,
+        cy: canvasRef.height,
+        radiusX: 100,
+        radiusY: 100,
+        rotation: 360,
+        startAngle: 360,
+        endAngle: 360,
+        lineWidth: 100,
+      };
+
+      const initialShapeParams = {
+        cx: 0,
+        cy: 0,
+        radiusX: 0,
+        radiusY: 0,
+        rotation: 0,
+        startAngle: 0,
+        endAngle: 0,
+        counterclockwise: true,
+        lineCap: 'butt',
+        strokeStyle: '#000000',
+        lineWidth: 0,
+        fill: false,
+        fillStyle: '#000000',
+      };
+
+      const controlMaxValues = savedControlMaxValues ?? initialControlMaxValues;
+      const shapeParams = savedShapeParams ?? initialShapeParams;
+
+      controlsShapeRef.addEventListener('change', onShapeCtrlChange);
+      controlsShapeRef.addEventListener('mousewheel', onShapeCtrlScroll);
+      controlsCanvasRef.addEventListener('change', onCanvasCtrlChange);
+
+      // initCanvasParams();
+      // initControlsValues();
+      // initControlsMaxValues();
       renderShape(shapeParams);
-    }
 
-    function setShapeParams(e) {
-      // set params
-      shapeParams[e.target.name] =
-        e.target.type === 'range' ? Number(e.target.value) : e.target.value;
-
-      if (e.target.dataset.type === 'angle') {
-        shapeParams[e.target.name] = convertGradToRadian(e.target.value);
+      // functions
+      function renderShape(shapeParams) {
+        return drawShape(canvasContext, shapeType, shapeParams);
       }
 
-      if (e.target.type === 'radio' && e.target.dataset.type === 'boolean') {
-        shapeParams[e.target.name] = e.target.value === 'true';
+      function onShapeCtrlChange(e) {
+        if (e.target.type === 'range') {
+          renderControlsValues(e.target);
+        }
+
+        if (e.target.dataset.type === 'max-value') {
+          setControlMaxValues(e);
+        } else {
+          setShapeParams(e);
+        }
+
+        if (e.target.type === 'color') {
+          for (const inputItem of controlsInputRefs) {
+            if (inputItem.name === e.target.name && inputItem.type === 'text') {
+              inputItem.value = e.target.value;
+            }
+          }
+        }
+
+        clearCanvas();
+        renderShape(shapeParams);
       }
 
-      if (e.target.type === 'checkbox' && e.target.dataset.type === 'boolean') {
-        shapeParams[e.target.name] = e.target.checked;
-      }
-      // ------------
-
-      // save params
-
-      writeParamsToLayerData('shapeParams', shapeParams);
-      saveLayersData();
-      // ------------
-    }
-
-    function renderControlsValues(inputRef) {
-      for (const valueItem of controlValueRefs) {
-        if (valueItem.dataset.value === inputRef.name) {
-          valueItem.innerText = inputRef.value;
+      function onShapeCtrlScroll(e) {
+        if (e.target.type !== 'range') {
           return;
         }
-      }
-    }
 
-    function setControlMaxValues(e) {
-      controlsInputRefs.forEach((controlItem) => {
-        if (controlItem.name === e.target.dataset.for) {
-          controlItem.max = e.target.value;
-          controlMaxValues[controlItem.name] = Number(e.target.value);
+        e.preventDefault();
+
+        const maxValue = Number(e.target.max);
+        const minValue = Number(e.target.min);
+        const step = Number(e.target.step);
+        const currentValue = Number(e.target.value);
+
+        if (e.deltaY < 0 && currentValue < maxValue) {
+          e.target.value = currentValue + step;
+        } else if (e.deltaY > 0 && currentValue > minValue) {
+          e.target.value = currentValue - step;
         }
-      });
 
-      localStorage.setItem(
-        'controlMaxValues',
-        JSON.stringify(controlMaxValues)
-      );
-    }
+        setShapeParams(e);
+        renderControlsValues(e.target);
 
-    function initControlsMaxValues() {
-      controlsMaxValueRefs.forEach((controlItem) => {
-        controlItem.value = controlMaxValues[controlItem.dataset.for];
-      });
-    }
+        clearCanvas();
+        renderShape(shapeParams);
+      }
 
-    function initCanvasParams() {
-      const savedCanvasParams = JSON.parse(
-        localStorage.getItem('canvasParams')
-      );
-
-      if (!savedCanvasParams) return;
-
-      canvasRef.width = savedCanvasParams.width;
-      canvasRef.height = savedCanvasParams.height;
-
-      const canvasControlsInputRefs = layerRef.querySelectorAll(
-        '[data-name="canvas-control-input"]'
-      );
-
-      for (const inputItem of canvasControlsInputRefs) {
-        switch (inputItem.name) {
+      function onCanvasCtrlChange(e) {
+        switch (e.target.name) {
           case 'canvas-width':
-            inputItem.value = savedCanvasParams.width;
+            canvasRef.width = e.target.value;
             break;
 
           case 'canvas-height':
-            inputItem.value = savedCanvasParams.height;
+            canvasRef.height = e.target.value;
             break;
 
           default:
             break;
         }
-      }
-    }
 
-    function clearCanvas() {
-      canvasContext.clearRect(0, 0, canvasRef.width, canvasRef.height);
-    }
+        const canvasParams = {
+          width: canvasRef.width,
+          height: canvasRef.height,
+        };
+
+        localStorage.setItem('canvasParams', JSON.stringify(canvasParams));
+
+        renderShape(shapeParams);
+      }
+
+      function setShapeParams(e) {
+        // set params
+        shapeParams[e.target.name] =
+          e.target.type === 'range' ? Number(e.target.value) : e.target.value;
+
+        if (e.target.dataset.type === 'angle') {
+          shapeParams[e.target.name] = convertGradToRadian(e.target.value);
+        }
+
+        if (e.target.type === 'radio' && e.target.dataset.type === 'boolean') {
+          shapeParams[e.target.name] = e.target.value === 'true';
+        }
+
+        if (
+          e.target.type === 'checkbox' &&
+          e.target.dataset.type === 'boolean'
+        ) {
+          shapeParams[e.target.name] = e.target.checked;
+        }
+        // ------------
+
+        // save params
+        writeParamsToLayerData('shapeParams', shapeParams);
+        saveLayersData();
+        // ------------
+      }
+
+      function renderControlsValues(inputRef) {
+        for (const valueItem of controlValueRefs) {
+          if (valueItem.dataset.value === inputRef.name) {
+            valueItem.innerText = inputRef.value;
+            return;
+          }
+        }
+      }
+
+      function setControlMaxValues(e) {
+        controlsInputRefs.forEach((controlItem) => {
+          if (controlItem.name === e.target.dataset.for) {
+            controlItem.max = e.target.value;
+            controlMaxValues[controlItem.name] = Number(e.target.value);
+          }
+        });
+
+        localStorage.setItem(
+          'controlMaxValues',
+          JSON.stringify(controlMaxValues)
+        );
+      }
+
+      function initControlsMaxValues() {
+        controlsMaxValueRefs.forEach((controlItem) => {
+          controlItem.value = controlMaxValues[controlItem.dataset.for];
+        });
+      }
+
+      function initCanvasParams() {
+        const savedCanvasParams = JSON.parse(
+          localStorage.getItem('canvasParams')
+        );
+
+        if (!savedCanvasParams) return;
+
+        canvasRef.width = savedCanvasParams.width;
+        canvasRef.height = savedCanvasParams.height;
+
+        const canvasControlsInputRefs = layerRef.querySelectorAll(
+          '[data-name="canvas-control-input"]'
+        );
+
+        for (const inputItem of canvasControlsInputRefs) {
+          switch (inputItem.name) {
+            case 'canvas-width':
+              inputItem.value = savedCanvasParams.width;
+              break;
+
+            case 'canvas-height':
+              inputItem.value = savedCanvasParams.height;
+              break;
+
+            default:
+              break;
+          }
+        }
+      }
+
+      function clearCanvas() {
+        canvasContext.clearRect(0, 0, canvasRef.width, canvasRef.height);
+      }
+    });
   }
 
   function renderSelectLayerOptions(layersData) {
-    const selectLayerOptionsMarkup = layersData.map((item) => {
-      return `
-        <option value="${item.id}" class="js-select-layer-option" selected>${item.id}</option>
+    const selectLayerOptionsMarkup = layersData
+      .map((item, index) => {
+        const isLastIndex = index === layersData.length - 1;
+
+        return `
+        <option value="${item.id}" class="js-select-layer-option" ${
+          isLastIndex ? 'selected' : ''
+        }>${item.name}</option>
       `;
-    });
+      })
+      .reverse();
 
     selectLayerRef.insertAdjacentHTML('afterbegin', selectLayerOptionsMarkup);
 
     selectLayerRef.classList.remove('is-hidden');
   }
 
-  // utils
   function writeParamsToLayerData(paramsName, paramsData) {
     for (const layerItem of LAYERS_DATA) {
       if (layerItem.id === CURRENT_LAYER_ID) {
@@ -534,21 +545,28 @@ function saveLayersData() {
     CURRENT_LAYER_ID = e.target.value;
   }
 
-  function deleteLayer() {
+  function deleteLayer(layerId) {
+    for (const layerItem of layersRefs) {
+      if (layerItem.id === layerId) {
+        layerItem.remove();
+      }
+    }
+
+    console.log(LAYERS_DATA);
+
+    // LAYERS_DATA = LAYERS_DATA.filter((layerItem) => layerItem.id !== layerId);
+    // saveLayersData();
+  }
+
+  function deleteSelectLayerOption(layerId) {
     const selectLayerOptionsRefs = selectLayerRef.getElementsByClassName(
       'js-select-layer-option'
     );
 
     for (const selectLayerOption of selectLayerOptionsRefs) {
       if (selectLayerOption.selected) {
-        CURRENT_LAYER_ID = selectLayerOption.value;
+        layerId = selectLayerOption.value;
         selectLayerOption.remove();
-      }
-    }
-
-    for (const layerItem of layersRefs) {
-      if (layerItem.id === CURRENT_LAYER_ID) {
-        layerItem.remove();
       }
     }
   }
