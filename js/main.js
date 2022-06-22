@@ -2,57 +2,6 @@
 
 const savedLayersData = getLayersData();
 const LAYER_ITEM_DATA = {};
-const testLayerData = [
-  {
-    id: 'ellipse-1',
-    type: 'ellipse',
-    shapeParams: {
-      cx: 112,
-      cy: 73,
-      radiusX: 38,
-      radiusY: 42,
-      rotation: 0,
-      startAngle: 3.159,
-      endAngle: 0,
-      counterclockwise: true,
-      lineCap: 'butt',
-      strokeStyle: '#000000',
-      lineWidth: 18,
-      fill: false,
-      fillStyle: '#000000',
-    },
-  },
-];
-/*{
-  id: 0,
-  type: 'ellipse',
-  canvasParams: { width: 300, height: 150 },
-  shapeParams: {
-    cx: 0,
-    cy: 0,
-    radiusX: 0,
-    radiusY: 0,
-    rotation: 0,
-    startAngle: 0,
-    endAngle: 0,
-    counterclockwise: true,
-    lineCap: 'butt',
-    strokeStyle: '#000000',
-    lineWidth: 2,
-    fill: true,
-    fillStyle: '#ffffff',
-  },
-  controlMaxValues: {
-    cx: 0,
-    cy: 0,
-    radiusX: 100,
-    radiusY: 100,
-    rotation: 360,
-    startAngle: 360,
-    endAngle: 360,
-    lineWidth: 100,
-  
-}};*/
 let LAYERS_DATA = [];
 
 function getLayersData() {
@@ -136,22 +85,6 @@ function saveLayersData() {
     }
   }
 
-  /*const ellipseCtrlParamsDefault = {
-    cx: { value: 0, maxValue: 100 },
-    cy: { value: 0, maxValue: 100 },
-    radiusX: { value: 0, maxValue: 100 },
-    radiusY: { value: 0, maxValue: 100 },
-    rotation: { value: 0, maxValue: 360 }, //6.2832
-    startAngle: { value: 0, maxValue: 360 },
-    endAngle: { value: 0, maxValue: 360 },
-    counterclockwise: { value: true },
-    lineCap: { value: 'butt' },
-    strokeStyle: { value: '#000000' },
-    lineWidth: { value: 2, maxValue: 100 },
-    fill: { value: true },
-    fillStyle: { value: '#ffffff' },
-  };*/
-
   function addLayer(shapeType) {
     const layerId = `${Date.now()}`;
 
@@ -221,42 +154,6 @@ function saveLayersData() {
 
     layersContainerRef.append(...layersMarkup);
     controlLayers(data);
-
-    function initControlsValues() {
-      if (!savedShapeParams) return;
-
-      controlsInputRefs.forEach((inputItem) => {
-        const savedValue = savedShapeParams[inputItem.name];
-
-        switch (inputItem.type) {
-          case 'range':
-            inputItem.value =
-              inputItem.dataset.type === 'angle'
-                ? convertRadianToGrad(savedValue)
-                : savedValue;
-
-            inputItem.max = controlMaxValues[inputItem.name];
-
-            renderControlsValues(inputItem);
-            break;
-
-          case 'radio':
-            const radioInputValue =
-              typeof savedValue === 'boolean' ? String(savedValue) : savedValue;
-
-            inputItem.checked = inputItem.value === radioInputValue;
-            break;
-
-          case 'checkbox':
-            if (typeof savedValue === 'boolean') inputItem.checked = savedValue;
-            break;
-
-          default:
-            inputItem.value = savedValue;
-            break;
-        }
-      });
-    }
   }
 
   function controlLayers(data) {
@@ -278,65 +175,22 @@ function saveLayersData() {
 
       const shapeType = layerRef.dataset.shape;
 
-      const ellipseShapeParamsDefault = {
-        cx: 100,
-        cy: 100,
-        radiusX: 50,
-        radiusY: 50,
-        rotation: 0,
-        startAngle: 2,
-        endAngle: 0,
-        counterclockwise: true,
-        lineCap: 'butt',
-        strokeStyle: '#000000',
-        lineWidth: 2,
-        fill: true,
-        fillStyle: 'green',
-      };
-
       // get saved params
-      const savedControlMaxValues = null; //for test
-      // const savedShapeParams = null; //for test
+      const savedControlMaxValues = layerItem.controlMaxValues;
       const savedShapeParams = layerItem.shapeParams;
       // ------------
 
-      const initialControlMaxValues = {
-        cx: canvasRef.width,
-        cy: canvasRef.height,
-        radiusX: 100,
-        radiusY: 100,
-        rotation: 360,
-        startAngle: 360,
-        endAngle: 360,
-        lineWidth: 100,
-      };
-
-      const initialShapeParams = {
-        cx: 0,
-        cy: 0,
-        radiusX: 0,
-        radiusY: 0,
-        rotation: 0,
-        startAngle: 0,
-        endAngle: 0,
-        counterclockwise: true,
-        lineCap: 'butt',
-        strokeStyle: '#000000',
-        lineWidth: 0,
-        fill: false,
-        fillStyle: '#000000',
-      };
-
-      const controlMaxValues = savedControlMaxValues ?? initialControlMaxValues;
-      const shapeParams = savedShapeParams ?? initialShapeParams;
+      const shapeParams = savedShapeParams ?? shapeParamsDefault[shapeType];
+      const controlMaxValues =
+        savedControlMaxValues ?? controlMaxValuesDefault[shapeType];
 
       controlsShapeRef.addEventListener('change', onShapeCtrlChange);
       controlsShapeRef.addEventListener('mousewheel', onShapeCtrlScroll);
       controlsCanvasRef.addEventListener('change', onCanvasCtrlChange);
 
-      // initCanvasParams();
-      // initControlsValues();
-      // initControlsMaxValues();
+      initCanvasParams(layerItem);
+      initControlsValues();
+      initControlsMaxValues();
       renderShape(shapeParams);
 
       // functions
@@ -411,8 +265,6 @@ function saveLayersData() {
           height: canvasRef.height,
         };
 
-        localStorage.setItem('canvasParams', JSON.stringify(canvasParams));
-
         renderShape(shapeParams);
       }
 
@@ -459,11 +311,6 @@ function saveLayersData() {
             controlMaxValues[controlItem.name] = Number(e.target.value);
           }
         });
-
-        localStorage.setItem(
-          'controlMaxValues',
-          JSON.stringify(controlMaxValues)
-        );
       }
 
       function initControlsMaxValues() {
@@ -472,10 +319,47 @@ function saveLayersData() {
         });
       }
 
-      function initCanvasParams() {
-        const savedCanvasParams = JSON.parse(
-          localStorage.getItem('canvasParams')
-        );
+      function initControlsValues() {
+        if (!savedShapeParams) return;
+
+        controlsInputRefs.forEach((inputItem) => {
+          const savedValue = savedShapeParams[inputItem.name];
+
+          switch (inputItem.type) {
+            case 'range':
+              inputItem.value =
+                inputItem.dataset.type === 'angle'
+                  ? convertRadianToGrad(savedValue)
+                  : savedValue;
+
+              inputItem.max = controlMaxValues[inputItem.name];
+
+              renderControlsValues(inputItem);
+              break;
+
+            case 'radio':
+              const radioInputValue =
+                typeof savedValue === 'boolean'
+                  ? String(savedValue)
+                  : savedValue;
+
+              inputItem.checked = inputItem.value === radioInputValue;
+              break;
+
+            case 'checkbox':
+              if (typeof savedValue === 'boolean')
+                inputItem.checked = savedValue;
+              break;
+
+            default:
+              inputItem.value = savedValue;
+              break;
+          }
+        });
+      }
+
+      function initCanvasParams(data) {
+        const savedCanvasParams = data.canvasParams;
 
         if (!savedCanvasParams) return;
 
