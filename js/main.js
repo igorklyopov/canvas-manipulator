@@ -22,8 +22,6 @@ function saveLayersData() {
   const layersContainerRef = document.getElementById('layers_container');
   const layersRefs = document.getElementsByClassName('js-layer');
 
-  let CURRENT_LAYER_ID = null;
-
   let LAYER_NUMBER =
     LAYERS_DATA.length === 0 ? LAYERS_DATA.length + 1 : LAYERS_DATA.length;
 
@@ -88,8 +86,6 @@ function saveLayersData() {
   function addLayer(shapeType) {
     const layerId = `${Date.now()}`;
 
-    CURRENT_LAYER_ID = layerId;
-
     const layerData = {};
 
     layerData.id = layerId;
@@ -101,6 +97,7 @@ function saveLayersData() {
     const newLayerData = LAYERS_DATA.slice(LAYERS_DATA.length - 1);
     renderLayers(newLayerData);
     renderSelectLayerOptions(newLayerData);
+    controlLayers(newLayerData);
 
     LAYER_NUMBER += 1;
   }
@@ -153,7 +150,6 @@ function saveLayersData() {
     });
 
     layersContainerRef.append(...layersMarkup);
-    controlLayers(data);
   }
 
   function controlLayers(data) {
@@ -180,7 +176,12 @@ function saveLayersData() {
       const savedShapeParams = layerItem.shapeParams;
       // ------------
 
-      const shapeParams = savedShapeParams ?? shapeParamsDefault[shapeType];
+      let SHAPE_PARAMS = savedShapeParams
+        ? { ...savedShapeParams }
+        : {
+            ...shapeParamsDefault[shapeType],
+          };
+
       const controlMaxValues =
         savedControlMaxValues ?? controlMaxValuesDefault[shapeType];
 
@@ -191,7 +192,7 @@ function saveLayersData() {
       initCanvasParams(layerItem);
       initControlsValues();
       initControlsMaxValues();
-      renderShape(shapeParams);
+      renderShape(SHAPE_PARAMS);
 
       // functions
       function renderShape(shapeParams) {
@@ -205,8 +206,6 @@ function saveLayersData() {
 
         if (e.target.dataset.type === 'max-value') {
           setControlMaxValues(e);
-        } else {
-          setShapeParams(e);
         }
 
         if (e.target.type === 'color') {
@@ -217,8 +216,9 @@ function saveLayersData() {
           }
         }
 
+        setShapeParams(e);
         clearCanvas();
-        renderShape(shapeParams);
+        renderShape(SHAPE_PARAMS);
       }
 
       function onShapeCtrlScroll(e) {
@@ -243,7 +243,7 @@ function saveLayersData() {
         renderControlsValues(e.target);
 
         clearCanvas();
-        renderShape(shapeParams);
+        renderShape(SHAPE_PARAMS);
       }
 
       function onCanvasCtrlChange(e) {
@@ -260,37 +260,32 @@ function saveLayersData() {
             break;
         }
 
-        const canvasParams = {
-          width: canvasRef.width,
-          height: canvasRef.height,
-        };
-
-        renderShape(shapeParams);
+        renderShape(SHAPE_PARAMS);
       }
 
       function setShapeParams(e) {
         // set params
-        shapeParams[e.target.name] =
+        SHAPE_PARAMS[e.target.name] =
           e.target.type === 'range' ? Number(e.target.value) : e.target.value;
 
         if (e.target.dataset.type === 'angle') {
-          shapeParams[e.target.name] = convertGradToRadian(e.target.value);
+          SHAPE_PARAMS[e.target.name] = convertGradToRadian(e.target.value);
         }
 
         if (e.target.type === 'radio' && e.target.dataset.type === 'boolean') {
-          shapeParams[e.target.name] = e.target.value === 'true';
+          SHAPE_PARAMS[e.target.name] = e.target.value === 'true';
         }
 
         if (
           e.target.type === 'checkbox' &&
           e.target.dataset.type === 'boolean'
         ) {
-          shapeParams[e.target.name] = e.target.checked;
+          SHAPE_PARAMS[e.target.name] = e.target.checked;
         }
         // ------------
 
         // save params
-        writeParamsToLayerData('shapeParams', shapeParams);
+        writeParamsToLayerData('shapeParams', SHAPE_PARAMS);
         saveLayersData();
         // ------------
       }
@@ -411,8 +406,10 @@ function saveLayersData() {
   }
 
   function writeParamsToLayerData(paramsName, paramsData) {
+    const currentLayerId = selectLayerRef.value;
+
     for (const layerItem of LAYERS_DATA) {
-      if (layerItem.id === CURRENT_LAYER_ID) {
+      if (layerItem.id === currentLayerId) {
         layerItem[paramsName] = paramsData;
       }
     }
@@ -424,8 +421,6 @@ function saveLayersData() {
         ? (layerItem.style.zIndex = LAYERS_DATA.length + 1)
         : (layerItem.style.zIndex = index);
     });
-
-    CURRENT_LAYER_ID = e.target.value;
   }
 
   function deleteLayer(layerId) {
