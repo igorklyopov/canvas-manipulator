@@ -1,7 +1,6 @@
 // ====== Layers data ======>
 
 const savedLayersData = getLayersData();
-const LAYER_ITEM_DATA = {};
 let LAYERS_DATA = [];
 
 function getLayersData() {
@@ -182,8 +181,9 @@ function saveLayersData() {
             ...shapeParamsDefault[shapeType],
           };
 
-      const controlMaxValues =
-        savedControlMaxValues ?? controlMaxValuesDefault[shapeType];
+      const CONTROL_MAX_VALUES = savedControlMaxValues
+        ? { ...savedControlMaxValues }
+        : { ...controlMaxValuesDefault[shapeType] };
 
       controlsShapeRef.addEventListener('change', onShapeCtrlChange);
       controlsShapeRef.addEventListener('mousewheel', onShapeCtrlScroll);
@@ -303,14 +303,17 @@ function saveLayersData() {
         controlsInputRefs.forEach((controlItem) => {
           if (controlItem.name === e.target.dataset.for) {
             controlItem.max = e.target.value;
-            controlMaxValues[controlItem.name] = Number(e.target.value);
+            CONTROL_MAX_VALUES[controlItem.name] = Number(e.target.value);
           }
         });
+
+        writeParamsToLayerData('controlMaxValues', CONTROL_MAX_VALUES);
+        saveLayersData();
       }
 
       function initControlsMaxValues() {
         controlsMaxValueRefs.forEach((controlItem) => {
-          controlItem.value = controlMaxValues[controlItem.dataset.for];
+          controlItem.value = CONTROL_MAX_VALUES[controlItem.dataset.for];
         });
       }
 
@@ -327,7 +330,7 @@ function saveLayersData() {
                   ? convertRadianToGrad(savedValue)
                   : savedValue;
 
-              inputItem.max = controlMaxValues[inputItem.name];
+              inputItem.max = CONTROL_MAX_VALUES[inputItem.name];
 
               renderControlsValues(inputItem);
               break;
