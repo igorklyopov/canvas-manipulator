@@ -76,7 +76,15 @@ h1 {
   text-align: center;
 }
 
-.layers-menu {
+
+
+.layer_menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.layer_menu_list{
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -118,6 +126,8 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  width: 100%;
 }
 
 .canvas_wrap {
@@ -125,7 +135,7 @@ h1 {
   margin-left: 10px;
 }
 
-.layer-header {
+.layer_header {
   display: flex;
   align-items: center;
   justify-content: space-between;

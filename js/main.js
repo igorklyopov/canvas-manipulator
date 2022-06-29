@@ -1,5 +1,4 @@
 // ====== Layers data ======>
-
 const savedLayersData = getLayersData();
 let LAYERS_DATA = [];
 
@@ -15,11 +14,13 @@ function saveLayersData() {
 // ====== Get layers ======>
 (() => {
   // refs
-  const layerHeaderRef = document.getElementById('layer-header');
-  const selectLayerRef = document.getElementById('select-layer');
-  const selectShapeRef = document.getElementById('select-shape');
+  const layerHeaderRef = document.getElementById('layer_header');
+  const selectLayerRef = document.getElementById('select_layer');
+  const selectShapeRef = document.getElementById('select_shape');
   const layersContainerRef = document.getElementById('layers_container');
-  const layersRefs = document.getElementsByClassName('js-layer');
+  const layersRefs = document.getElementsByClassName('js_layer');
+  const canvasControlsGlobalRef = document.querySelector('.js_controls_canvas');
+  const canvasGlobalRef = document.getElementsByClassName('js_canvas');
 
   let LAYER_NUMBER =
     LAYERS_DATA.length === 0 ? LAYERS_DATA.length + 1 : LAYERS_DATA.length;
@@ -43,8 +44,8 @@ function saveLayersData() {
     renderSelectLayerOptions(LAYERS_DATA);
   }
 
+  // ------ Layers menu ------>
   layerHeaderRef.addEventListener('click', onHeaderBtnClick);
-
   layerHeaderRef.addEventListener('change', onHeaderInputChange);
 
   function onHeaderBtnClick(e) {
@@ -69,11 +70,11 @@ function saveLayersData() {
 
   function onHeaderInputChange(e) {
     switch (e.target.dataset.function) {
-      case 'select-shape':
+      case 'select_shape':
         addLayer(e.target.value);
         break;
 
-      case 'select-layer':
+      case 'select_layer':
         selectLayer(e);
         break;
 
@@ -101,41 +102,36 @@ function saveLayersData() {
     LAYER_NUMBER += 1;
   }
 
+  function selectLayer(e) {
+    Array.from(layersRefs).forEach((layerItem, index) => {
+      layerItem.id === e.target.value
+        ? (layerItem.style.zIndex = LAYERS_DATA.length + 1)
+        : (layerItem.style.zIndex = index);
+    });
+  }
+
+  function deleteLayer(layerId) {
+    for (const layerItem of layersRefs) {
+      if (layerItem.id === layerId) {
+        layerItem.remove();
+      }
+    }
+
+    LAYERS_DATA = LAYERS_DATA.filter((layerItem) => layerItem.id !== layerId);
+    saveLayersData();
+  }
+
   function renderLayers(data) {
     const layersMarkup = data.map((layerItem) => {
       const layerItemEl = document.createElement('li');
       layerItemEl.setAttribute('id', layerItem.id);
       layerItemEl.setAttribute('data-shape', layerItem.type);
-      const layerItemElClassNames = ['layers_item', 'js-layer'];
+      const layerItemElClassNames = ['layers_item', 'js_layer'];
       layerItemEl.className = layerItemElClassNames.join(' ');
 
       const canvasFieldMarkup = `
         <div class="canvas_wrap">
-          <ul class="canvas_controls_list js_controls_canvas">
-            <li>
-              <label class="canvas-control">
-                <span class="controls-name">width</span>
-                <input
-                  type="number"
-                  value="300"
-                  name="canvas-width"
-                  data-name="canvas-control-input"
-                />
-              </label>
-            </li>
-            <li>
-              <label class="canvas-control">
-                <span class="controls-name">height</span>
-                <input
-                  type="number"
-                  value="150"
-                  name="canvas-height"
-                  data-name="canvas-control-input"
-                />
-              </label>
-            </li>
-          </ul>
-          <canvas class="canvas js-canvas"></canvas>
+          <canvas class="canvas js_canvas"></canvas>
         </div>
     `;
 
@@ -151,12 +147,107 @@ function saveLayersData() {
     layersContainerRef.append(...layersMarkup);
   }
 
+  function renderSelectLayerOptions(layersData) {
+    const selectLayerOptionsMarkup = layersData
+      .map((item, index) => {
+        const isLastIndex = index === layersData.length - 1;
+
+        return `
+        <option value="${item.id}" class="js_select_layer_option" ${
+          isLastIndex ? 'selected' : ''
+        }>${item.name}</option>
+      `;
+      })
+      .reverse();
+
+    selectLayerRef.insertAdjacentHTML('afterbegin', selectLayerOptionsMarkup);
+
+    selectLayerRef.classList.remove('is-hidden');
+  }
+
+  function deleteSelectLayerOption(layerId) {
+    const selectLayerOptionsRefs = selectLayerRef.getElementsByClassName(
+      'js_select_layer_option'
+    ); // or const selectLayerOptionsRefs = selectLayerRef.options
+
+    for (const selectLayerOption of selectLayerOptionsRefs) {
+      if (selectLayerOption.selected) {
+        layerId = selectLayerOption.value;
+        selectLayerOption.remove();
+      }
+    }
+
+    if (selectLayerRef.children.length < 1) {
+      selectLayerRef.classList.add('is-hidden');
+    }
+  }
+
+  function writeParamsToLayerData(paramsName, paramsData) {
+    const currentLayerId = selectLayerRef.value;
+
+    for (const layerItem of LAYERS_DATA) {
+      if (layerItem.id === currentLayerId) {
+        layerItem[paramsName] = paramsData;
+      }
+    }
+  }
+
+  //------ Canvas controls ------>
+  canvasControlsGlobalRef.addEventListener('input', onCanvasCtrlChange);
+
+  // function initCanvasParams(data) {
+  //   const savedCanvasParams = data.canvasParams;
+
+  //   if (!savedCanvasParams) return;
+
+  //   canvasRef.width = savedCanvasParams.width;
+  //   canvasRef.height = savedCanvasParams.height;
+
+  //   const canvasControlsInputRefs = layerRef.querySelectorAll(
+  //     '[data-name="canvas-control-input"]'
+  //   );
+
+  //   for (const inputItem of canvasControlsInputRefs) {
+  //     switch (inputItem.name) {
+  //       case 'canvas-width':
+  //         inputItem.value = savedCanvasParams.width;
+  //         break;
+
+  //       case 'canvas-height':
+  //         inputItem.value = savedCanvasParams.height;
+  //         break;
+
+  //       default:
+  //         break;
+  //     }
+  //   }
+  // }
+
+  function onCanvasCtrlChange(e) {
+    Array.from(canvasGlobalRef).forEach((canvasItem) => {
+      switch (e.target.name) {
+        case 'canvas-width':
+          canvasItem.width = e.target.value;
+          break;
+
+        case 'canvas-height':
+          canvasItem.height = e.target.value;
+          break;
+
+        default:
+          break;
+      }
+    });
+  }
+  // <------ END Canvas controls ------
+
+  // <------ END Layers menu ------
+
   function controlLayers(data) {
     data.forEach((layerItem) => {
       // refs
       const layerRef = document.getElementById(layerItem.id);
       const controlsShapeRef = layerRef.querySelector('.js_controls_shape');
-      const controlsCanvasRef = layerRef.querySelector('.js_controls_canvas');
       const controlsInputRefs = layerRef.querySelectorAll('.js_control_input');
       const controlsMaxValueRefs = layerRef.querySelectorAll(
         '[data-type="max-value"]'
@@ -164,7 +255,7 @@ function saveLayersData() {
       const controlValueRefs = layerRef.querySelectorAll('[data-value]');
 
       // canvas
-      const canvasRef = layerRef.querySelector('.js-canvas');
+      const canvasRef = layerRef.querySelector('.js_canvas');
       const canvasContext = canvasRef.getContext('2d');
       //------------
 
@@ -187,9 +278,24 @@ function saveLayersData() {
 
       controlsShapeRef.addEventListener('change', onShapeCtrlChange);
       controlsShapeRef.addEventListener('mousewheel', onShapeCtrlScroll);
-      controlsCanvasRef.addEventListener('change', onCanvasCtrlChange);
 
-      initCanvasParams(layerItem);
+      //--- Render shape if canvas width or height will be changing --->
+      let observer = new MutationObserver((mutationRecords) => {
+        if (
+          (mutationRecords[0].type === 'attributes' &&
+            mutationRecords[0].attributeName === 'width') ||
+          mutationRecords[0].attributeName === 'height'
+        ) {
+          renderShape(SHAPE_PARAMS);
+        }
+      });
+
+      observer.observe(canvasRef, {
+        attributes: true,
+      });
+      //<-----------------------------------------------------
+
+      // initCanvasParams(layerItem);
       initControlsValues();
       initControlsMaxValues();
       renderShape(SHAPE_PARAMS);
@@ -243,23 +349,6 @@ function saveLayersData() {
         renderControlsValues(e.target);
 
         clearCanvas();
-        renderShape(SHAPE_PARAMS);
-      }
-
-      function onCanvasCtrlChange(e) {
-        switch (e.target.name) {
-          case 'canvas-width':
-            canvasRef.width = e.target.value;
-            break;
-
-          case 'canvas-height':
-            canvasRef.height = e.target.value;
-            break;
-
-          default:
-            break;
-        }
-
         renderShape(SHAPE_PARAMS);
       }
 
@@ -356,102 +445,10 @@ function saveLayersData() {
         });
       }
 
-      function initCanvasParams(data) {
-        const savedCanvasParams = data.canvasParams;
-
-        if (!savedCanvasParams) return;
-
-        canvasRef.width = savedCanvasParams.width;
-        canvasRef.height = savedCanvasParams.height;
-
-        const canvasControlsInputRefs = layerRef.querySelectorAll(
-          '[data-name="canvas-control-input"]'
-        );
-
-        for (const inputItem of canvasControlsInputRefs) {
-          switch (inputItem.name) {
-            case 'canvas-width':
-              inputItem.value = savedCanvasParams.width;
-              break;
-
-            case 'canvas-height':
-              inputItem.value = savedCanvasParams.height;
-              break;
-
-            default:
-              break;
-          }
-        }
-      }
-
       function clearCanvas() {
         canvasContext.clearRect(0, 0, canvasRef.width, canvasRef.height);
       }
     });
-  }
-
-  function renderSelectLayerOptions(layersData) {
-    const selectLayerOptionsMarkup = layersData
-      .map((item, index) => {
-        const isLastIndex = index === layersData.length - 1;
-
-        return `
-        <option value="${item.id}" class="js-select-layer-option" ${
-          isLastIndex ? 'selected' : ''
-        }>${item.name}</option>
-      `;
-      })
-      .reverse();
-
-    selectLayerRef.insertAdjacentHTML('afterbegin', selectLayerOptionsMarkup);
-
-    selectLayerRef.classList.remove('is-hidden');
-  }
-
-  function writeParamsToLayerData(paramsName, paramsData) {
-    const currentLayerId = selectLayerRef.value;
-
-    for (const layerItem of LAYERS_DATA) {
-      if (layerItem.id === currentLayerId) {
-        layerItem[paramsName] = paramsData;
-      }
-    }
-  }
-
-  function selectLayer(e) {
-    Array.from(layersRefs).forEach((layerItem, index) => {
-      layerItem.id === e.target.value
-        ? (layerItem.style.zIndex = LAYERS_DATA.length + 1)
-        : (layerItem.style.zIndex = index);
-    });
-  }
-
-  function deleteLayer(layerId) {
-    for (const layerItem of layersRefs) {
-      if (layerItem.id === layerId) {
-        layerItem.remove();
-      }
-    }
-
-    LAYERS_DATA = LAYERS_DATA.filter((layerItem) => layerItem.id !== layerId);
-    saveLayersData();
-  }
-
-  function deleteSelectLayerOption(layerId) {
-    const selectLayerOptionsRefs = selectLayerRef.getElementsByClassName(
-      'js-select-layer-option'
-    ); // or const selectLayerOptionsRefs = selectLayerRef.options
-
-    for (const selectLayerOption of selectLayerOptionsRefs) {
-      if (selectLayerOption.selected) {
-        layerId = selectLayerOption.value;
-        selectLayerOption.remove();
-      }
-    }
-
-    if (selectLayerRef.children.length < 1) {
-      selectLayerRef.classList.add('is-hidden');
-    }
   }
 })();
 // <===== END Get layers ======

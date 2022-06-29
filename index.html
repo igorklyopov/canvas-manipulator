@@ -10,41 +10,86 @@
   <body>
     <h1>Canvas manipulator</h1>
 
-    <div class="container layer-header" id="layer-header">
-      <div class="">
-        <button type="button" class="add-layer-btn" data-function="add-layer">
-          Add shape
-        </button>
-        <select
-          name="select-shape"
-          id="select-shape"
-          data-function="select-shape"
-          class="shape-select"
-        >
-          <option value="ellipse">Ellipse</option>
-          <option value="rectangle">Rectangle</option>
-          <option value="line">Line</option>
-        </select>
+    <div class="container layer_header" id="layer_header">
+      <div class="layer_menu">
+        <ul class="layer_menu_list layer_menu_add">
+          <li>
+            <button
+              type="button"
+              class="add-layer-btn"
+              data-function="add-layer"
+            >
+              Add shape
+            </button>
+          </li>
+          <li>
+            <select
+              name="select_shape"
+              id="select_shape"
+              data-function="select_shape"
+              class="shape-select"
+            >
+              <option value="ellipse">Ellipse</option>
+              <option value="rectangle">Rectangle</option>
+              <option value="line">Line</option>
+            </select>
+          </li>
+        </ul>
+        <ul class="layer_menu_list layer_menu_change">
+          <li>
+            <select
+              name="select_layer"
+              id="select_layer"
+              data-function="select_layer"
+              class="layer-select is-hidden"
+            ></select>
+          </li>
+          <li>
+            <button
+              type="button"
+              class="copy-layer-btn"
+              data-function="copy-layer"
+            >
+              Copy layer
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              class="delete-layer-btn"
+              data-function="delete-layer"
+            >
+              Delete layer
+            </button>
+          </li>
+          <li>
+            <ul class="canvas_controls_list js_controls_canvas">
+              <li>
+                <label class="canvas-control">
+                  <span class="controls-name">width</span>
+                  <input
+                    type="number"
+                    value="300"
+                    name="canvas-width"
+                    data-name="canvas-control-input"
+                  />
+                </label>
+              </li>
+              <li>
+                <label class="canvas-control">
+                  <span class="controls-name">height</span>
+                  <input
+                    type="number"
+                    value="150"
+                    name="canvas-height"
+                    data-name="canvas-control-input"
+                  />
+                </label>
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
-
-      <select
-        name="select-layer"
-        id="select-layer"
-        data-function="select-layer"
-        class="layer-select is-hidden"
-      ></select>
-
-      <button type="button" class="copy-layer-btn" data-function="copy-layer">
-        Copy layer
-      </button>
-
-      <button
-        type="button"
-        class="delete-layer-btn"
-        data-function="delete-layer"
-      >
-        Delete layer
-      </button>
     </div>
 
     <ul class="container layers_list" id="layers_container"></ul>
