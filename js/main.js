@@ -65,7 +65,7 @@ function saveCanvasParams(params) {
         break;
 
       case 'copy-layer':
-        // copyLayer()
+        copyLayer(selectLayerRef.value);
         break;
 
       case 'delete-layer':
@@ -94,17 +94,18 @@ function saveCanvasParams(params) {
   }
 
   function addLayer(shapeType) {
-    const layerId = `${Date.now()}`;
+    const newLayerId = `${Date.now()}`;
 
     const layerData = {};
 
-    layerData.id = layerId;
+    layerData.id = newLayerId;
     layerData.name = `${shapeType} ${LAYER_NUMBER}`;
     layerData.type = shapeType;
 
     LAYERS_DATA.push(layerData);
 
     const newLayerData = LAYERS_DATA.slice(LAYERS_DATA.length - 1);
+
     renderLayers(newLayerData);
     renderSelectLayerOptions(newLayerData);
     controlLayers(newLayerData);
@@ -118,6 +119,30 @@ function saveCanvasParams(params) {
         ? (layerItem.style.zIndex = LAYERS_DATA.length + 1)
         : (layerItem.style.zIndex = index);
     });
+  }
+
+  function copyLayer(layerId) {
+    const newLayerId = `${Date.now()}`;
+
+    const layerData = Object.assign(
+      {},
+      LAYERS_DATA.find((layer) => layer.id === layerId)
+    );
+
+    layerData.id = newLayerId;
+    layerData.name = `${layerData.name}(copy)`;
+
+    LAYERS_DATA.push(layerData);
+
+    const newLayerData = LAYERS_DATA.slice(LAYERS_DATA.length - 1);
+
+    renderLayers(newLayerData);
+    renderSelectLayerOptions(newLayerData);
+    controlLayers(newLayerData);
+
+    LAYER_NUMBER += 1;
+
+    saveLayersData();
   }
 
   function deleteLayer(layerId) {
@@ -481,7 +506,3 @@ function saveCanvasParams(params) {
   }
 })();
 // <===== END Get layers ======
-
-// ====== ======>
-//
-// <====== ======
