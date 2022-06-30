@@ -9,7 +9,17 @@ function getLayersData() {
 function saveLayersData() {
   localStorage.setItem('layers', JSON.stringify(LAYERS_DATA));
 }
-// <====== ======
+// <====== END Layers data ======
+
+// ====== Canvas params save/get ======>
+function getCanvasParams() {
+  return JSON.parse(localStorage.getItem('canvasParams'));
+}
+
+function saveCanvasParams(params) {
+  localStorage.setItem('canvasParams', JSON.stringify(params));
+}
+// <====== END Canvas params ======
 
 // ====== Get layers ======>
 (() => {
@@ -193,35 +203,39 @@ function saveLayersData() {
   }
 
   //------ Canvas controls ------>
+  initCanvasParams();
+
   canvasControlsGlobalRef.addEventListener('input', onCanvasCtrlChange);
 
-  // function initCanvasParams(data) {
-  //   const savedCanvasParams = data.canvasParams;
+  function initCanvasParams() {
+    const savedCanvasParams = getCanvasParams();
 
-  //   if (!savedCanvasParams) return;
+    if (!savedCanvasParams) return;
 
-  //   canvasRef.width = savedCanvasParams.width;
-  //   canvasRef.height = savedCanvasParams.height;
+    const canvasControlsInputRefs = document.querySelectorAll(
+      '[data-name="canvas-control-input"]'
+    );
 
-  //   const canvasControlsInputRefs = layerRef.querySelectorAll(
-  //     '[data-name="canvas-control-input"]'
-  //   );
+    for (const inputItem of canvasControlsInputRefs) {
+      switch (inputItem.name) {
+        case 'canvas-width':
+          inputItem.value = savedCanvasParams.width;
+          break;
 
-  //   for (const inputItem of canvasControlsInputRefs) {
-  //     switch (inputItem.name) {
-  //       case 'canvas-width':
-  //         inputItem.value = savedCanvasParams.width;
-  //         break;
+        case 'canvas-height':
+          inputItem.value = savedCanvasParams.height;
+          break;
 
-  //       case 'canvas-height':
-  //         inputItem.value = savedCanvasParams.height;
-  //         break;
+        default:
+          break;
+      }
+    }
 
-  //       default:
-  //         break;
-  //     }
-  //   }
-  // }
+    Array.from(canvasGlobalRef).forEach((canvasItem) => {
+      canvasItem.width = savedCanvasParams.width;
+      canvasItem.height = savedCanvasParams.height;
+    });
+  }
 
   function onCanvasCtrlChange(e) {
     Array.from(canvasGlobalRef).forEach((canvasItem) => {
@@ -238,6 +252,17 @@ function saveLayersData() {
           break;
       }
     });
+
+    const canvasParams = {
+      width: 300,
+      height: 150,
+    };
+
+    const canvasParamName = e.target.name.replace('canvas-', '');
+
+    canvasParams[canvasParamName] = Number(e.target.value);
+
+    saveCanvasParams(canvasParams);
   }
   // <------ END Canvas controls ------
 
@@ -295,7 +320,6 @@ function saveLayersData() {
       });
       //<-----------------------------------------------------
 
-      // initCanvasParams(layerItem);
       initControlsValues();
       initControlsMaxValues();
       renderShape(SHAPE_PARAMS);
@@ -452,10 +476,6 @@ function saveLayersData() {
   }
 })();
 // <===== END Get layers ======
-
-// ====== ======>
-//
-// <====== ======
 
 // ====== ======>
 //
