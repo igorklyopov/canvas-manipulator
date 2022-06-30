@@ -181,8 +181,7 @@ function saveCanvasParams(params) {
     ); // or const selectLayerOptionsRefs = selectLayerRef.options
 
     for (const selectLayerOption of selectLayerOptionsRefs) {
-      if (selectLayerOption.selected) {
-        layerId = selectLayerOption.value;
+      if (selectLayerOption.selected && layerId === selectLayerOption.value) {
         selectLayerOption.remove();
       }
     }
@@ -289,6 +288,7 @@ function saveCanvasParams(params) {
       // get saved params
       const savedControlMaxValues = layerItem.controlMaxValues;
       const savedShapeParams = layerItem.shapeParams;
+      const savedCanvasParams = getCanvasParams();
       // ------------
 
       let SHAPE_PARAMS = savedShapeParams
@@ -323,6 +323,11 @@ function saveCanvasParams(params) {
       initControlsValues();
       initControlsMaxValues();
       renderShape(SHAPE_PARAMS);
+
+      if (savedCanvasParams) {
+        canvasRef.width = savedCanvasParams.width;
+        canvasRef.height = savedCanvasParams.height;
+      }
 
       // functions
       function renderShape(shapeParams) {
