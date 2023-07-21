@@ -54,6 +54,8 @@ function saveCanvasParams(params) {
     renderSelectLayerOptions(LAYERS_DATA);
   }
 
+  console.log('LAYERS_DATA', LAYERS_DATA);
+
   // ------ Layers menu ------>
   layerHeaderRef.addEventListener('click', onHeaderBtnClick);
   layerHeaderRef.addEventListener('change', onHeaderInputChange);
@@ -190,7 +192,7 @@ function saveCanvasParams(params) {
         return `
         <option value="${item.id}" class="js_select_layer_option" ${
           isLastIndex ? 'selected' : ''
-        }>${item.name}</option>
+        } >${item.name}</option>
       `;
       })
       .reverse();
